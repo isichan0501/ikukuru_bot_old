@@ -111,8 +111,12 @@ def main(tem_ple):
             if is_mail:
                 break
 
-
-
+        #asiato
+        for i in range(3):
+            is_asiato = ik.asiato_newface(driver, ppn)
+            if is_asiato:
+                break
+            
 if __name__ == "__main__":
     df = get_sheet_with_pd(sheetname=SHEET_NAME)
     #イククルのIDのあるアカウントだけ
@@ -126,12 +130,14 @@ if __name__ == "__main__":
         tem_ple = df.iloc[n,:]
         is_main = main(tem_ple)
         
-        # if tem_ple['cnm'] in ['eri', 'yuri']:
+        # if tem_ple['cnm'] != 'yuri':
         #     continue
-        #---driver---
+        # #---driver---
         # driver = compose_driver(proxy_info=False, userdata_dir=None, use_profile=None, use_ua=tem_ple['ua'])
         # ik = ik_helper.Ikkr(tem_ple)
         # is_login = ik.login(driver)
+
+        
         # #画像設定されていたらTrue、その場合のみ投稿やメッセージ返信に進む
         # is_img = ik.ik_profimg(driver)
         # ik.ik_prof1(driver)
@@ -141,5 +147,5 @@ if __name__ == "__main__":
         # ik.ik_prof_basyo(driver)
         # ik.toko_check(driver)
         
-        # import pdb;pdb.set_trace()
+        import pdb;pdb.set_trace()
         # driver.quit()

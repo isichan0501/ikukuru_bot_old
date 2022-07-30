@@ -623,22 +623,27 @@ class Ikkr:
 # 2-2-2-1,足跡有でメルアド落とし有でメルアド有で見ちゃいや（メモ）なし　＝＝　gmail送信で見ちゃいや（メモ）
 # 2-2-2-2,足跡有でメルアド落とし有でメルアド有で見ちゃいや（メモ）有　＝＝　何もしない
 
+
     @pysnooper.snoop()
-    def mobuik_asi(self, driver, ppn):
+    def asiato_newface(self, driver, ppn):
         tem_ple = self.tem_ple
         wait = WebDriverWait(driver, 10)
         res_word = ""
         try:
-            page_load(driver, "https://sp.194964.com/menu.html")
-            slowClick(driver, "xpath", "//a[2]/img")
+            page_load(driver, "https://sp.194964.com/sns/snsashiato/show.html")
             wait.until(EC.presence_of_all_elements_located)
-            mobu = driver.find_elements(By.XPATH,"//*[@id=\"tab1\"]//div[@class=\"type-list-name\"]/img")
+            new_faces = driver.find_elements(By.XPATH,"//*[@id=\"tab1\"]//div[@class=\"type-list-name\"]/img")
             try:
-                mobuu = mobu[ppn]
+                new_face = new_faces[ppn]
             except IndexError:
                 return True
-            exe_click(driver, "ok", mobu[ppn])
+            exe_click(driver, "ok", new_faces[ppn])
             time.sleep(2)
+            #履歴確認
+            history_btn = driver.find_element(By.XPATH, "*//div[@class=\"user-profile-btn-history\"]").get_attribute('style')
+            if "none" not in history_btn:
+                print('this user exist history. return')
+                return None
             namae = driver.find_element(By.ID, "titleNickname").text
             asiato = tem_ple["asiato"].replace('namae', namae)
 
@@ -647,12 +652,12 @@ class Ikkr:
                 return None
             exe_click(driver, "id", "messageBtn")
             time.sleep(2)
-            mySendkey(driver, "id", "send-message", asiato)
+            #相手が年齢確認してないと定型文以外送れないので定型文を選択
+            exe_click(driver, "id", "message-d-1")
+            # my_emojiSend(driver, "id", "send-message", asiato)
             time.sleep(1)
-            exe_click(
-                driver, "xpath", "//*[@id=\"submitMessageButton\"]/button")
+            exe_click(driver, "xpath", "//*[@id=\"submitMessageButton\"]/button")
             time.sleep(1)
-
             # 0,足跡があるかないか
             return None
         except (socket.timeout, NoSuchElementException, TimeoutException,
@@ -698,6 +703,8 @@ class Ikkr:
                 ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
             lg.exception(e)
             return None
+
+
 
     @pysnooper.snoop()
     def delete_mitya(self, driver):

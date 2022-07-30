@@ -4,7 +4,7 @@ import pandas as pd
 import time
 from BotHelper import JsonSearch, get_sheet_with_pd, set_sheet_with_pd, line_push, writeSheet
 from BotHelper.util_driver import compose_driver, twitter_login, ouath_twitter_not_login, http_check, wifi_reboot, check_ip, s3_img
-
+from BotHelper.util_driver import moji_hikaku, page_load, myClick, exe_click, mySendkey, slowClick, my_emojiSend, emoji_convert, add_ifin, send_gmail, mail_what, s3_img
 import pysnooper
 from importlib import reload
 import os
@@ -124,14 +124,20 @@ if __name__ == "__main__":
     for loop_num, n in enumerate(ik_index):
         #テンプレ取得
         tem_ple = df.iloc[n,:]
-        is_main = main(tem_ple)
+        # is_main = main(tem_ple)
         
-        # if tem_ple['cnm'] in ['eri', 'yuri']:
-        #     continue
+        if tem_ple['cnm'] != 'yuri':
+            continue
         #---driver---
-        # driver = compose_driver(proxy_info=False, userdata_dir=None, use_profile=None, use_ua=tem_ple['ua'])
-        # ik = ik_helper.Ikkr(tem_ple)
-        # is_login = ik.login(driver)
+        driver = compose_driver(proxy_info=False, userdata_dir=None, use_profile=None, use_ua=tem_ple['ua'])
+        ik = ik_helper.Ikkr(tem_ple)
+        is_login = ik.login(driver)
+        #asiato
+        for ppn in range(3):
+            is_asiato = ik.asiato_newface(driver, ppn)
+            if is_asiato:
+                break
+        
         # #画像設定されていたらTrue、その場合のみ投稿やメッセージ返信に進む
         # is_img = ik.ik_profimg(driver)
         # ik.ik_prof1(driver)
@@ -141,5 +147,5 @@ if __name__ == "__main__":
         # ik.ik_prof_basyo(driver)
         # ik.toko_check(driver)
         
-        # import pdb;pdb.set_trace()
+        import pdb;pdb.set_trace()
         # driver.quit()
