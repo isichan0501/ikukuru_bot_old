@@ -41,6 +41,9 @@ from BotHelper import line_push, writeSheet, change_cell
 from dotenv import load_dotenv
 import re
 import random
+import atexit
+import json
+
 
 lg = logging.getLogger(__name__)
 
@@ -62,6 +65,29 @@ class Ikkr:
         self.myid = self.tem_ple['ik'].split(':')[0]
         self.mypw = self.tem_ple['ik'].split(':')[1]
         self.cnm = tem_ple['cnm']
+
+        self.action_data = {
+            "cnm": tem_ple['cnm'],
+            "id_pw": tem_ple['ik'],
+            "hajime": 0,
+            "asiato": 0,
+            "meruado_otosi": 0,
+            "gmail": 0
+            }
+
+
+    @pysnooper.snoop()
+    @atexit.register
+    def notify_bot_log(self):
+        message = json.dumps(self.action_data)
+        lg.debug(message)
+        line_push(message)
+
+        
+    def __del__(self):
+        self.notify_bot_log()
+        
+        
 
     @pysnooper.snoop()
     def login(self, driver):
@@ -624,12 +650,21 @@ class Ikkr:
                 By.XPATH, "//*[@id=\"title\"]/ul/li[2]").text
             my_send = driver.find_elements(
                 By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
+            meruado = tem_ple['meruado'].replace('namae', namae)
             # もし自分の送信がなければ
             if len(my_send) == 0:
-                meruado = tem_ple['meruado'].replace('namae', namae)
                 self.ik_msg(driver, meruado)
+                #行動記録を追加
+                self.action_data['meruado_otosi'] += 1
                 return None
 
+            send_check = [m.text for m in my_send if moji_hikaku(m.text, meruado)]
+            if len(send_check) == 0:
+                self.ik_msg(driver, meruado)
+                #行動記録を追加
+                self.action_data['meruado_otosi'] += 1
+                return None
+            
             last_message = my_send[-1].text.replace('★プロフィールから送信', '')
             if moji_hikaku(last_message, tem_ple["after_mail"]):
                 lg.debug('this user after mail sended.')
@@ -646,7 +681,9 @@ class Ikkr:
                     send_gmail(tem_ple['formurl'], tem_ple['namae'],
                                tem_ple['money'], mailado, kenmei)
                     self.ik_msg(driver, tem_ple["after_mail"])
+                    self.action_data['gmail'] += 1
                     return None
+
 
             return None
         except (socket.timeout, NoSuchElementException, TimeoutException,
@@ -691,6 +728,7 @@ class Ikkr:
             time.sleep(1)
             exe_click(driver, "xpath","//*[@id=\"submitMessageButton\"]/button")
             time.sleep(1)
+            self.action_data['hajime'] += 1
             # exe_click(driver,"link_text","あしあとを残す")
             # exe_click(driver,"xpath","//div[@id='popupContent']/div/button")
         except (socket.timeout, NoSuchElementException, TimeoutException,
@@ -730,6 +768,7 @@ class Ikkr:
             time.sleep(1)
             exe_click(driver, "xpath","//*[@id=\"submitMessageButton\"]/button")
             time.sleep(1)
+            self.action_data['asiato'] += 1
             # exe_click(driver,"link_text","あしあとを残す")
             # exe_click(driver,"xpath","//div[@id='popupContent']/div/button")
         except (socket.timeout, NoSuchElementException, TimeoutException,
@@ -1095,32 +1134,32 @@ class Ikkr:
             elem = "/html/body/article/div[2]/div[{0}]/a".format(myRum)
             exe_click(driver, "xpath", elem)
             time.sleep(3)
-            driver.get(
-                "https://sp.194964.com/profile/profilesearch/show_profile_search.html")
-            time.sleep(4)
-            exe_click(driver, "id", "city_button")
-            time.sleep(4)
-            pref_elem = driver.find_elements(
-                By.XPATH, "/html/body/article//input[@name='prefAndCity[]']")
-            if len(pref_elem) != 0:
-                exe_click(
-                    driver, "xpath", "/html/body/article//input[@name='prefAndCity[]']")
-                time.sleep(1)
-                wait.until(EC.element_to_be_clickable(
-                    (By.XPATH, "//*[@id='prefAndCity']/div[2]/button"))).submit()
-                time.sleep(2)
-                exe_click(driver, "id", "city_button")
-                time.sleep(2)
-            bnm = int(self.basyo_change(basyo)) + 3
-            elem = "/html/body/article/div[1]/div[{0}]/a".format(bnm)
-            exe_click(driver, "xpath", elem)
-            time.sleep(3)
-            driver.find_element(By.ID, "checkbox1").click()
-            driver.execute_script("scrollBy(0,1200);")
-            wait.until(EC.element_to_be_clickable(
-                (By.XPATH, "//*[@id='form1']/div[2]/button"))).submit()
-            time.sleep(2)
-            exe_click(driver, "id", "input_search_outer")
+            # driver.get(
+            #     "https://sp.194964.com/profile/profilesearch/show_profile_search.html")
+            # time.sleep(4)
+            # exe_click(driver, "id", "city_button")
+            # time.sleep(4)
+            # pref_elem = driver.find_elements(
+            #     By.XPATH, "/html/body/article//input[@name='prefAndCity[]']")
+            # if len(pref_elem) != 0:
+            #     exe_click(
+            #         driver, "xpath", "/html/body/article//input[@name='prefAndCity[]']")
+            #     time.sleep(1)
+            #     wait.until(EC.element_to_be_clickable(
+            #         (By.XPATH, "//*[@id='prefAndCity']/div[2]/button"))).submit()
+            #     time.sleep(2)
+            #     exe_click(driver, "id", "city_button")
+            #     time.sleep(2)
+            # bnm = int(self.basyo_change(basyo)) + 3
+            # elem = "/html/body/article/div[1]/div[{0}]/a".format(bnm)
+            # exe_click(driver, "xpath", elem)
+            # time.sleep(3)
+            # driver.find_element(By.ID, "checkbox1").click()
+            # driver.execute_script("scrollBy(0,1200);")
+            # wait.until(EC.element_to_be_clickable(
+            #     (By.XPATH, "//*[@id='form1']/div[2]/button"))).submit()
+            # time.sleep(2)
+            # exe_click(driver, "id", "input_search_outer")
             return True
         except (socket.timeout, NoSuchElementException, TimeoutException,
                 ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:

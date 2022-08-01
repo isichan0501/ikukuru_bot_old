@@ -130,6 +130,25 @@ def mail_try(ik, driver):
     for ppn in range(10, 1, -1):
         ik.search_user(driver, ppn)
 
+
+def initial_setting(ik, driver):
+    """
+    画像やプロフ設定、投稿など最初にやること
+    """
+    #画像設定されていたらTrue、その場合のみ投稿やメッセージ返信に進む
+    is_img = ik.ik_profimg(driver)
+    if not is_img:
+        return False
+    ik.ik_prof1(driver)
+    ik.ik_prof2(driver)
+    ik.prof_text(driver)
+    ik.ik_basyo(driver)
+    #これは地域１つだけランダムで設定
+    # ik.ik_prof_basyo(driver)
+    #地方すべて選択
+    ik.ik_change_search_prof_area(driver)
+    is_toko = ik.toko_check(driver)
+
     
 def super_main(tem_ple, main_loop=3):
     """
