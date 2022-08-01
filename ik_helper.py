@@ -190,20 +190,37 @@ class Ikkr:
 
     @pysnooper.snoop()
     def toko_check(self, driver):
+        """
+        junList = ["今から遊ぼ", "すぐ会いたい", "大人の出会い", "友達・恋人・合コン", "アブノーマル"]
+        全ジャンル投稿してたらリターンTrue.
+        してなければ、してないジャンルで投稿
+        """
         tem_ple = self.tem_ple
         wait = WebDriverWait(driver, 15)
         lg.debug(self.tem_ple["cnm"])
         junList = ["今から遊ぼ", "すぐ会いたい", "大人の出会い", "友達・恋人・合コン", "アブノーマル"]
+        selected_junls = []
         basyo = ""
         random.seed()
         try:
-            page_load(
-                driver, "https://sp.194964.com/bbs/show_bbs_write_list.html")
+            page_load(driver, "https://sp.194964.com/bbs/show_bbs_write_list.html")
             # 今投稿しているジャンルをチェック
-            myjunls = driver.find_elements(
-                By.XPATH, "/html/body/article/div[1]/form[1]//div[@class=\'bgMiddle btn\']//p[@class=\'left btnBorderRound\']")
-            myjunl = [myjunls[i].text for i in range(len(myjunls))]
-            junlSet = set(junList) - set(myjunl)
+
+            #まずはピュア募集
+            exe_click(driver, "link_text", "ピュア募集")
+            junl_elements = driver.find_elements(By.XPATH, "/html/body/article/div[1]/form[1]//div[@class=\'bgMiddle btn\']//p[@class=\'left btnBorderRound\']")
+            if len(junl_elements) != 0:
+                pure_junls = [jl.text for jl in junl_elements]
+                selected_junls.extend(pure_junls)
+                
+            #大人の募集
+            exe_click(driver, "link_text", "大人の募集")
+            junl_elements = driver.find_elements(By.XPATH, "/html/body/article/div[1]/form[1]//div[@class=\'bgMiddle btn\']//p[@class=\'left btnBorderRound\']")
+            if len(junl_elements) != 0:
+                adult_junls = [jl.text for jl in junl_elements]
+                selected_junls.extend(adult_junls)
+                
+            junlSet = set(junList) - set(selected_junls)
             # 全部投稿してたら終了
             if junlSet == set():
                 return True
@@ -233,13 +250,13 @@ class Ikkr:
             if not tokois:
                 tokois = self.toko(driver, basyo, junl)
 
-            return None
+            return False
 
         except (socket.timeout, NoSuchElementException, TimeoutException,
                 ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
             lg.exception(e)
             driver.refresh()
-            return None
+            return False
 
     # ピュア 今から遊ぼ,友達・恋人・合コン
     # アダルト すぐ会いたい、大人の出会い、アブノーマル
@@ -648,6 +665,78 @@ class Ikkr:
 # 2-2-2-1,足跡有でメルアド落とし有でメルアド有で見ちゃいや（メモ）なし　＝＝　gmail送信で見ちゃいや（メモ）
 # 2-2-2-2,足跡有でメルアド落とし有でメルアド有で見ちゃいや（メモ）有　＝＝　何もしない
 
+    @pysnooper.snoop()
+    def search_user(self, driver, ppn):
+        tem_ple = self.tem_ple
+
+        wait = WebDriverWait(driver, 10)
+        try:
+            page_load(driver, "https://sp.194964.com/profile/profilesearch/show_profile_search.html")
+            exe_click(driver, "id", "input_search_outer")
+            exe_click(driver, "xpath", "(//a[contains(text(),\"プロフィールを見る\")])[{0}]".format(ppn))
+            time.sleep(2)
+            # 履歴確認
+            history_btn = driver.find_element(
+                By.XPATH, "*//div[@class=\"user-profile-btn-history\"]").get_attribute('style')
+            if "none" not in history_btn:
+                lg.debug('this user exist history. return')
+                return None
+            namae = driver.find_element(By.ID, "titleNickname").text
+            hajime = tem_ple["hajime"].replace('namae', namae)
+
+            #send message
+            exe_click(driver, "id", "messageBtn")
+            time.sleep(2)
+            my_emojiSend(driver, "id", "send-message", hajime)
+            time.sleep(1)
+            exe_click(driver, "xpath","//*[@id=\"submitMessageButton\"]/button")
+            time.sleep(1)
+            # exe_click(driver,"link_text","あしあとを残す")
+            # exe_click(driver,"xpath","//div[@id='popupContent']/div/button")
+        except (socket.timeout, NoSuchElementException, TimeoutException,
+                ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
+            lg.exception(e)
+
+
+    @pysnooper.snoop()
+    def asiato_kaesi(self, driver, ppn):
+        """
+        ppnは足跡ページのユーザーリストの何番目のユーザーを選択するか
+        10から2の間で
+        """
+        tem_ple = self.tem_ple
+        wait = WebDriverWait(driver, 10)
+        res_word = ""
+        try:
+            page_load(driver, "https://sp.194964.com/sns/snsashiato/show.html")
+            wait.until(EC.presence_of_all_elements_located)
+            #userの個別ページへ
+            user_link = driver.find_element(By.XPATH, "//*[@id=\"tab1\"]/div[{}]/a".format(ppn))
+            exe_click(driver, "ok", user_link)
+            time.sleep(2)
+            # 履歴確認
+            history_btn = driver.find_element(
+                By.XPATH, "*//div[@class=\"user-profile-btn-history\"]").get_attribute('style')
+            if "none" not in history_btn:
+                lg.debug('this user exist history. return')
+                return None
+            namae = driver.find_element(By.ID, "titleNickname").text
+            hajime = tem_ple["hajime"].replace('namae', namae)
+
+            #send message
+            exe_click(driver, "id", "messageBtn")
+            time.sleep(2)
+            my_emojiSend(driver, "id", "send-message", hajime)
+            time.sleep(1)
+            exe_click(driver, "xpath","//*[@id=\"submitMessageButton\"]/button")
+            time.sleep(1)
+            # exe_click(driver,"link_text","あしあとを残す")
+            # exe_click(driver,"xpath","//div[@id='popupContent']/div/button")
+        except (socket.timeout, NoSuchElementException, TimeoutException,
+                ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
+            lg.exception(e)
+
+
 
     @pysnooper.snoop()
     def asiato_newface(self, driver, ppn):
@@ -683,8 +772,7 @@ class Ikkr:
             exe_click(driver, "id", "message-d-1")
             # my_emojiSend(driver, "id", "send-message", asiato)
             time.sleep(1)
-            exe_click(driver, "xpath",
-                      "//*[@id=\"submitMessageButton\"]/button")
+            exe_click(driver, "xpath","//*[@id=\"submitMessageButton\"]/button")
             time.sleep(1)
             # 0,足跡があるかないか
             return None
@@ -765,11 +853,9 @@ class Ikkr:
 
         wait = WebDriverWait(driver, 10)
         try:
-            page_load(
-                driver, "https://sp.194964.com/profile/profilesearch/show_profile_search.html")
+            page_load(driver, "https://sp.194964.com/profile/profilesearch/show_profile_search.html")
             exe_click(driver, "id", "input_search_outer")
-            exe_click(
-                driver, "xpath", "(//a[contains(text(),\"プロフィールを見る\")])[{0}]".format(ppn))
+            exe_click(driver, "xpath", "(//a[contains(text(),\"プロフィールを見る\")])[{0}]".format(ppn))
             time.sleep(random.randint(8, 16))
             # exe_click(driver,"link_text","あしあとを残す")
             # exe_click(driver,"xpath","//div[@id='popupContent']/div/button")
@@ -853,13 +939,16 @@ class Ikkr:
         wait = WebDriverWait(driver, 15)
         lg.debug(tem_ple["cnm"])
         random.seed()
-        if not tem_ple["height"]:
+        if (tem_ple["height"] == '') or isinstance(tem_ple["height"], float):
             tem_ple["height"] = "155～159"
-        if not tem_ple["style"]:
+        if (tem_ple["style"] == '') or isinstance(tem_ple["style"], float):
             tem_ple["style"] = "普通"
-        if not tem_ple["marriage"]:
+        if (tem_ple["marriage"] == '') or isinstance(tem_ple["marriage"], float):
             tem_ple["marriage"] = "未婚"
-        myage = "{0}歳".format(tem_ple["age"])
+
+        age_str = str(int(tem_ple["age"])).strip()
+        myage = age_str + "歳"
+        print(myage)
         try:
             page_load(
                 driver, "https://sp.194964.com/config/settingprof/show_profile_setting.html")
@@ -867,16 +956,20 @@ class Ikkr:
             wait.until(EC.element_to_be_clickable((By.NAME, "name")))
             myname = driver.find_element(
                 By.NAME, "name").get_attribute("Value")
-            if myname in self.tem_ple["myname"]:
-                self.mydict.update({"namae": "ok"})
-            else:
-                mySendkey(driver, "name", "name", self.tem_ple["myname"])
+
+
+            if tem_ple["myname"] != myname:
+                mySendkey(driver, "name", "name", tem_ple["myname"])
             select = Select(driver.find_element(By.NAME, "age"))
             age_now = select.all_selected_options[0].text
-            if self.tem_ple["age"] in age_now:
+            if myage == age_now:
                 print('age ok')
             else:
                 select.select_by_visible_text(myage)
+
+            if (tem_ple["myname"] == myname) and (myage == age_now):
+                print('prof name and age ok. return True')
+                return True
             with suppress(NoSuchElementException):
                 Select(driver.find_element(By.NAME, "height")
                        ).select_by_visible_text(tem_ple["height"])
@@ -899,7 +992,6 @@ class Ikkr:
             wait.until(EC.element_to_be_clickable(
                 (By.XPATH, "/html/body/article/div/form//button[contains(text(), \"更新する\")]"))).submit()
             time.sleep(4)
-            Ikkr.checktb.upsert(self.mydict, Ikkr.Que.id == self.myid)
 
             return True
         except (socket.timeout, NoSuchElementException, TimeoutException,
@@ -911,21 +1003,24 @@ class Ikkr:
         tem_ple = self.tem_ple
         wait = WebDriverWait(driver, 15)
         lg.debug(tem_ple["cnm"])
+        myjob = str(tem_ple["ik_job"])
         random.seed()
         try:
             page_load(
                 driver, "https://sp.194964.com/sns/snssetting/show_edit_profile.html")
-            with suppress(NoSuchElementException):
-                select = Select(driver.find_element(By.NAME, "birthCity"))
-                max_select = len(select.options) - 1
-                sind = random.randint(1, max_select)
-                select.select_by_index(sind)
+            # with suppress(NoSuchElementException):
+            #     select = Select(driver.find_element(By.NAME, "birthCity"))
+            #     max_select = len(select.options) - 1
+            #     sind = random.randint(1, max_select)
+            #     select.select_by_index(sind)
             select = Select(driver.find_element(By.NAME, "occupation"))
             job_now = select.all_selected_options[0].text
-            if self.tem_ple["ik_job"] in job_now:
-                print('job ok')
+            
+            if myjob == job_now:
+                print('job ok.return True')
+                return True
             else:
-                select.select_by_visible_text(tem_ple["ik_job"])
+                select.select_by_visible_text(myjob)
             with suppress(NoSuchElementException):
                 Select(driver.find_element(By.NAME,
                                            "income")).select_by_index(0)
@@ -953,10 +1048,9 @@ class Ikkr:
                 Select(driver.find_element(By.NAME,
                                            "ageFrom")).select_by_index(1)
             with suppress(NoSuchElementException):
-                Select(driver.find_element(By.NAME, "ageTo")).select_by_index(5)
+                Select(driver.find_element(By.NAME, "ageTo")).select_by_index(10)
             wait.until(EC.element_to_be_clickable(
                 (By.XPATH, "/html/body/article/form/div//button[contains(text(), \"更新する\")]"))).submit()
-            Ikkr.checktb.upsert(self.mydict, Ikkr.Que.id == self.myid)
             time.sleep(2)
 
         except (socket.timeout, NoSuchElementException, TimeoutException,
@@ -970,8 +1064,7 @@ class Ikkr:
         lg.debug(tem_ple["cnm"])
         random.seed()
         try:
-            page_load(
-                driver, "https://sp.194964.com/other/area/show_pref_setting_list.html")
+            page_load(driver, "https://sp.194964.com/other/area/show_pref_setting_list.html")
             time.sleep(2)
             wait.until(EC.visibility_of_element_located(
                 (By.XPATH, "/html/body/article/div[1]/span[2]")))
@@ -1061,19 +1154,18 @@ class Ikkr:
             basyo = tem_ple["area"]
 
         try:
-            driver.get(
-                "https://sp.194964.com/profile/profilesearch/show_profile_search.html")
+            #プロフ検索で探す相手の場所を設定
+            driver.get("https://sp.194964.com/profile/profilesearch/show_profile_search.html")
             time.sleep(4)
             exe_click(driver, "id", "city_button")
             time.sleep(4)
+            #もし既に検索地域が設定されていたら削除
             pref_elem = driver.find_elements(
                 By.XPATH, "/html/body/article//input[@name='prefAndCity[]']")
             if len(pref_elem) != 0:
-                exe_click(
-                    driver, "xpath", "/html/body/article//input[@name='prefAndCity[]']")
+                exe_click(driver, "xpath", "/html/body/article//input[@name='prefAndCity[]']")
                 time.sleep(1)
-                wait.until(EC.element_to_be_clickable(
-                    (By.XPATH, "//*[@id='prefAndCity']/div[2]/button"))).submit()
+                wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='prefAndCity']/div[2]/button"))).submit()
                 time.sleep(2)
                 exe_click(driver, "id", "city_button")
                 time.sleep(2)
@@ -1094,6 +1186,111 @@ class Ikkr:
         except (socket.timeout, NoSuchElementException, TimeoutException,
                 ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
             lg.exception(e)
+
+
+    @pysnooper.snoop()
+    def get_area_list(self):
+        tem_ple = self.tem_ple
+        lg.debug(tem_ple["cnm"])
+        myadd = tem_ple["area"]
+        if any(map(tem_ple["area"].__contains__, ("名古屋", "愛知", "岐阜", "三重", "長野", "静岡", "愛知県", "岐阜県", "三重県", "長野県", "静岡県"))):
+            area_list = ['愛知', '静岡', '岐阜', '三重', '長野']
+        elif any(map(tem_ple["area"].__contains__, ("神奈川", "埼玉", "千葉", "茨城", "栃木", "群馬", "東京", "埼玉県", "千葉県", "茨城県", "栃木県", "群馬県", "東京都", "神奈川県"))):
+            area_list = ['神奈川', '埼玉', '千葉', '三重', '東京', '群馬', '茨城', '栃木']
+
+        elif any(map(tem_ple["area"].__contains__, ("青森", "岩手", "宮城", "福島", "秋田", "山形"))):
+            area_list = ['青森', '岩手', '宮城', '福島', '秋田', '山形']
+        elif any(map(tem_ple["area"].__contains__, ("大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"))):
+            area_list = ['大阪', '滋賀', '京都', '兵庫', '奈良', '和歌山']
+
+        else:
+            area_list = [myadd]
+
+        return area_list
+        
+    @pysnooper.snoop()
+    def ik_change_search_prof_area(self, driver):
+        """
+        地域を複数選択するように変更。
+        東海地方なら　愛知、岐阜、三重、静岡、長野
+        """
+        tem_ple = self.tem_ple
+        wait = WebDriverWait(driver, 15)
+        lg.debug(tem_ple["cnm"])
+        random.seed()
+        myadd = tem_ple["area"]
+        if any(map(tem_ple["area"].__contains__, ("名古屋", "愛知", "岐阜", "三重", "長野", "静岡", "愛知県", "岐阜県", "三重県", "長野県", "静岡県"))):
+            area_list = ['愛知', '静岡', '岐阜', '三重', '長野']
+        elif any(map(tem_ple["area"].__contains__, ("神奈川", "埼玉", "千葉", "茨城", "栃木", "群馬", "東京", "埼玉県", "千葉県", "茨城県", "栃木県", "群馬県", "東京都", "神奈川県"))):
+            area_list = ['神奈川', '埼玉', '千葉', '三重', '東京', '群馬', '茨城', '栃木']
+
+        elif any(map(tem_ple["area"].__contains__, ("青森", "岩手", "宮城", "福島", "秋田", "山形"))):
+            area_list = ['青森', '岩手', '宮城', '福島', '秋田', '山形']
+        elif any(map(tem_ple["area"].__contains__, ("大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"))):
+            area_list = ['大阪', '滋賀', '京都', '兵庫', '奈良', '和歌山']
+
+        else:
+            area_list = [myadd]
+        try:
+            #プロフ検索で探す相手の場所を設定
+            driver.get("https://sp.194964.com/profile/profilesearch/show_profile_search.html")
+            time.sleep(4)
+            exe_click(driver, "id", "city_button")
+            time.sleep(4)
+            #すでに設定されていたら終了
+            area_text_element = driver.find_elements(By.ID, "prefAndCity")
+            if len(area_text_element) != 0:
+                area_text = area_text_element[0].text
+                area_check = [basyo for basyo in area_list if basyo in area_text]
+                if len(area_check) == len(area_list):
+                    print('area ok.return True')
+                    return True
+            #もし既に検索地域が設定されていたら削除
+            pref_elem = driver.find_elements(
+                By.XPATH, "/html/body/article//input[@name='prefAndCity[]']")
+            if len(pref_elem) != 0:
+                exe_click(driver, "xpath", "/html/body/article//input[@name='prefAndCity[]']")
+                time.sleep(1)
+                wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='prefAndCity']/div[2]/button"))).submit()
+                time.sleep(2)
+                exe_click(driver, "id", "city_button")
+                time.sleep(2)
+
+            #愛知、静岡、岐阜、三重、長野を追加
+            for basyo in area_list:
+                city_btn = driver.find_elements(By.ID, "city_button")
+                if len(city_btn) != 0:
+                    exe_click(driver, "id", "city_button")
+                
+                change_city_btn = driver.find_elements(By.ID, "btnChange")
+                if len(change_city_btn) != 0:
+                    exe_click(driver, "id", "btnChange")
+                
+                bnm = int(self.basyo_change(basyo)) + 3
+                elem = "/html/body/article/div[1]/div[{0}]/a".format(bnm)
+                exe_click(driver, "xpath", elem)
+                time.sleep(3)
+                is_check = driver.find_element(By.ID, "checkbox1").get_attribute('checked')
+                if not is_check:
+                    driver.find_element(By.ID, "checkbox1").click()
+                driver.execute_script("scrollBy(0,1200);")
+                wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='form1']/div[2]/button"))).submit()
+                wait.until(EC.presence_of_all_elements_located)
+                time.sleep(2)
+            # time.sleep(3)
+            #Select(driver.find_element(By.NAME, "ageTo")).select_by_index(3)
+
+            search_profile_element = driver.find_elements(By.LINK_TEXT, "プロフィール検索")
+            if len(search_profile_element) != 0:
+                exe_click(driver, "LINK_TEXT", "プロフィール検索")
+            time.sleep(2)
+            exe_click(driver, "id", "input_search_outer")
+            return True
+        except (socket.timeout, NoSuchElementException, TimeoutException,
+                ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
+            lg.exception(e)
+
+
 
     @pysnooper.snoop()
     def ik_aitai(self, driver):
