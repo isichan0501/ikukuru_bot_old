@@ -98,8 +98,9 @@ class Ikkr:
                 imgName = "{0}.png".format(self.myid)
                 driver.get_screenshot_as_file(imgName)
                 time.sleep(2)
-                sub = "{0}{1}{2}ik潰れたよ".format(self.myid, self.mypw, self.cnm)
+                sub = "{0}:{1} {2} イククル潰れたよ".format(self.myid, self.mypw, self.cnm)
                 line_push(sub, imgName)
+                change_cell(SHEET_NAME, self.tem_ple['ik'], "")
                 False
 
             with suppress(socket.timeout, NoSuchElementException, TimeoutException, Exception):
