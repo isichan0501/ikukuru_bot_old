@@ -56,7 +56,7 @@ class Ikkr:
 
         Args:
             tem_ple (dict): 
-                
+
         """
         self.tem_ple = tem_ple
         self.myid = self.tem_ple['ik'].split(':')[0]
@@ -83,7 +83,8 @@ class Ikkr:
                     return 1
                 wait.until(EC.element_to_be_clickable(
                     (By.XPATH, "//*[@id='form1']/div[1]/div/select")))
-                Select(driver.find_element(By.NAME, "mailAddressDomain")).select_by_visible_text("その他のアドレス")
+                Select(driver.find_element(By.NAME, "mailAddressDomain")
+                       ).select_by_visible_text("その他のアドレス")
 
             mySendkey(
                 driver, "xpath", "//*[@id='form1']/div[1]/input", self.myid)
@@ -198,7 +199,8 @@ class Ikkr:
             page_load(
                 driver, "https://sp.194964.com/bbs/show_bbs_write_list.html")
             # 今投稿しているジャンルをチェック
-            myjunls = driver.find_elements(By.XPATH,"/html/body/article/div[1]/form[1]//div[@class=\'bgMiddle btn\']//p[@class=\'left btnBorderRound\']")
+            myjunls = driver.find_elements(
+                By.XPATH, "/html/body/article/div[1]/form[1]//div[@class=\'bgMiddle btn\']//p[@class=\'left btnBorderRound\']")
             myjunl = [myjunls[i].text for i in range(len(myjunls))]
             junlSet = set(junList) - set(myjunl)
             # 全部投稿してたら終了
@@ -212,13 +214,13 @@ class Ikkr:
                                         "/html/body/article/div[1]/span[2]").text
             if any(map(tem_ple["area"].__contains__, ("名古屋", "愛知", "岐阜", "三重", "長野", "静岡"))):
                 basyo = random.choice(
-                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "愛知", "愛知", "愛知", "愛知", "長野", "三重", "岐阜","静岡"])
+                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "愛知", "愛知", "愛知", "愛知", "長野", "三重", "岐阜", "静岡"])
             elif any(map(tem_ple["area"].__contains__, ("埼玉", "千葉", "茨城", "栃木", "群馬", "東京"))):
                 basyo = random.choice(
-                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "埼玉", "埼玉", "埼玉", "茨城", "栃木", "群馬", "千葉","千葉"])
+                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "埼玉", "埼玉", "埼玉", "茨城", "栃木", "群馬", "千葉", "千葉"])
             elif any(map(tem_ple["area"].__contains__, ("青森", "岩手", "宮城", "福島", "秋田", "山形"))):
                 basyo = random.choice(
-                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "宮城", "宮城", "宮城", "青森", "岩手", "福島", "秋田","山形"])
+                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "宮城", "宮城", "宮城", "青森", "岩手", "福島", "秋田", "山形"])
             elif any(map(tem_ple["area"].__contains__, ("大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"))):
                 basyo = random.choice(
                     [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"])
@@ -263,7 +265,8 @@ class Ikkr:
             time.sleep(2)
             wait.until(EC.element_to_be_clickable(
                 (By.XPATH, "/html/body/article/div/div[20]/a")))
-            elm = driver.find_element(By.XPATH,"/html/body/article/div/div[{0}]/a".format(int(basyo_num)))
+            elm = driver.find_element(
+                By.XPATH, "/html/body/article/div/div[{0}]/a".format(int(basyo_num)))
             driver.execute_script("arguments[0].click();", elm)
             time.sleep(2)
             page_load(driver, "https://sp.194964.com/menu.html")
@@ -290,7 +293,8 @@ class Ikkr:
             time.sleep(1)
             WebDriverWait(driver, 10).until(
                 EC.presence_of_all_elements_located)
-            el = driver.find_element(By.XPATH,"//span[@class=\"subMenu100\" and contains(text(), \"{0}\")]".format(junl))
+            el = driver.find_element(
+                By.XPATH, "//span[@class=\"subMenu100\" and contains(text(), \"{0}\")]".format(junl))
             el.click()
             time.sleep(2)
             select = Select(driver.find_element(By.XPATH,
@@ -340,7 +344,8 @@ class Ikkr:
             time.sleep(2)
             wait.until(EC.element_to_be_clickable(
                 (By.XPATH, "/html/body/article/div/div[20]/a")))
-            elm = driver.find_element(By.XPATH,"/html/body/article/div/div[{0}]/a".format(int(basyo_num)))
+            elm = driver.find_element(
+                By.XPATH, "/html/body/article/div/div[{0}]/a".format(int(basyo_num)))
             driver.execute_script("arguments[0].click();", elm)
             time.sleep(2)
             driver.get("https://sp.194964.com/bbs/show_bbs_write_list.html")
@@ -349,12 +354,15 @@ class Ikkr:
             exe_click(driver, "xpath", toko_elem)
             time.sleep(2)
 
-            last_toko = driver.find_elements(By.XPATH,"//div[@class=\"bgMiddle btn\"]//div[@class=\"contentsContribute\"]/a")
+            last_toko = driver.find_elements(
+                By.XPATH, "//div[@class=\"bgMiddle btn\"]//div[@class=\"contentsContribute\"]/a")
             driver.execute_script("arguments[0].click();", last_toko[-1])
             time.sleep(2)
-            saitoko = driver.find_elements(By.XPATH, "/html/body/article//form/button[@type='submit' and contains(text(), '再投稿する')]")
+            saitoko = driver.find_elements(
+                By.XPATH, "/html/body/article//form/button[@type='submit' and contains(text(), '再投稿する')]")
             if len(saitoko) == 0:
-                hensyu = driver.find_elements(By.XPATH,"/html/body/article//form/button[contains(text(), \"編集する\")]")
+                hensyu = driver.find_elements(
+                    By.XPATH, "/html/body/article//form/button[contains(text(), \"編集する\")]")
                 if len(hensyu) != 0:
                     hensyu[0].submit()
                     time.sleep(2)
@@ -362,7 +370,8 @@ class Ikkr:
                         driver, "xpath", "//*[@id=\"formID\"]/div/button[contains(text(), \"募集する\")]")
 
                 else:
-                    delete_elem = driver.find_elements(By.XPATH,"/html/body/article//form/button[contains(text(), \"削除する\")]")
+                    delete_elem = driver.find_elements(
+                        By.XPATH, "/html/body/article//form/button[contains(text(), \"削除する\")]")
                     if len(delete_elem) != 0:
                         delete_elem[0].submit()
                         time.sleep(2)
@@ -372,7 +381,8 @@ class Ikkr:
                             delete_elem2[0].submit()
                             time.sleep(2)
             else:
-                exe_click(driver, "xpath","/html/body/article//form/button[@type='submit' and contains(text(), \"再投稿する\")]")
+                exe_click(
+                    driver, "xpath", "/html/body/article//form/button[@type='submit' and contains(text(), \"再投稿する\")]")
                 time.sleep(3)
                 select = Select(driver.find_element(By.XPATH,
                                                     "//*[@id=\"formID\"]/div[1]/select"))
@@ -398,7 +408,8 @@ class Ikkr:
             page_load(
                 driver, "https://sp.194964.com/bbs/show_bbs_write_list.html")
             time.sleep(1)
-            checks = driver.find_elements(By.XPATH,"//div[@class=\"bgMiddle btn\"]//input[@type=\"checkbox\"]")
+            checks = driver.find_elements(
+                By.XPATH, "//div[@class=\"bgMiddle btn\"]//input[@type=\"checkbox\"]")
             # 投稿数が5超えたら全削除
             if len(checks) < int(del_min):
                 return None
@@ -516,8 +527,10 @@ class Ikkr:
             #me_mo = driver.find_element(By.XPATH, "//p/a/span").text
             # if "メモの確認" in me_mo:
             #    return None
-            last_send = driver.find_elements(By.XPATH,"//*[@id=\"mailboxList\"]//div")
-            namae = driver.find_element(By.XPATH,"//*[@id=\"title\"]/ul/li[2]").text
+            last_send = driver.find_elements(
+                By.XPATH, "//*[@id=\"mailboxList\"]//div")
+            namae = driver.find_element(
+                By.XPATH, "//*[@id=\"title\"]/ul/li[2]").text
             #namae = namae[1:]
             if len(last_send) == 0:
                 asiato = tem_ple['asiato'].replace('namae', namae)
@@ -527,10 +540,13 @@ class Ikkr:
             last_sendd = last_send[-1].get_attribute("class")
             if "OTHER" not in last_sendd.upper():
                 return None
-            my_send = driver.find_elements(By.XPATH,"//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
+            my_send = driver.find_elements(
+                By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
             mylis = [myl.text.replace('★プロフィールから送信', '') for myl in my_send]
-            my_receive = driver.find_elements(By.XPATH,"//*[@id=\"mailboxList\"]//div[@class=\"bubble_other\"]")
-            list_you = [yul.text.replace('★プロフィールから送信', '')for yul in my_receive]
+            my_receive = driver.find_elements(
+                By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_other\"]")
+            list_you = [yul.text.replace('★プロフィールから送信', '')
+                        for yul in my_receive]
 
             mylis[-1]
             list_you.extend(mylis)
@@ -555,14 +571,16 @@ class Ikkr:
         tem_ple = self.tem_ple
         wait = WebDriverWait(driver, 10)
         try:
-            page_load(driver, "https://sp.194964.com/mail/inbox/show_mailbox.html")
+            page_load(
+                driver, "https://sp.194964.com/mail/inbox/show_mailbox.html")
             elm = driver.find_element(By.XPATH, "/html/body/nav/div[3]").text
             ex_mg = re.sub("\\D", "", elm)
             if not ex_mg:
                 return True
             for i in range(2, 5, 1):
                 if 4 < i:
-                    exe_click(driver, "xpath", "/html/body/article/div[1]/div[1]/a")
+                    exe_click(driver, "xpath",
+                              "/html/body/article/div[1]/div[1]/a")
                     driver.execute_script("scrollBy(0,1200);")
                     wait.until(
                         EC.element_to_be_clickable((By.XPATH, "/html/body/article/div[2]/form[2]/div/button"))).submit()
@@ -572,7 +590,8 @@ class Ikkr:
                     wait.until(EC.presence_of_all_elements_located)
                     return True
                 driver.execute_script("scrollBy(0,200);")
-                new_img = driver.find_elements(By.XPATH,"//div[@class=\"bgMiddle btn \"]//span[@class=\"icon-new-box\"]")
+                new_img = driver.find_elements(
+                    By.XPATH, "//div[@class=\"bgMiddle btn \"]//span[@class=\"icon-new-box\"]")
                 if not new_img:
                     tugi = driver.find_element(By.LINK_TEXT, "{}".format(i))
                     driver.execute_script("arguments[0].click();", tugi)
@@ -583,9 +602,11 @@ class Ikkr:
 
             # メッセージ送信
             wait.until(EC.presence_of_all_elements_located)
-            namae = driver.find_element(By.XPATH,"//*[@id=\"title\"]/ul/li[2]").text
-            my_send = driver.find_elements(By.XPATH,"//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
-            #もし自分の送信がなければ
+            namae = driver.find_element(
+                By.XPATH, "//*[@id=\"title\"]/ul/li[2]").text
+            my_send = driver.find_elements(
+                By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
+            # もし自分の送信がなければ
             if len(my_send) == 0:
                 meruado = tem_ple['meruado'].replace('namae', namae)
                 self.ik_msg(driver, meruado)
@@ -596,13 +617,16 @@ class Ikkr:
                 lg.debug('this user after mail sended.')
                 return None
 
-            my_receive = driver.find_elements(By.XPATH,"//*[@id=\"mailboxList\"]//div[@class=\"bubble_other\"]")
-            list_you = [yul.text.replace('★プロフィールから送信', '')for yul in my_receive]
+            my_receive = driver.find_elements(
+                By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_other\"]")
+            list_you = [yul.text.replace('★プロフィールから送信', '')
+                        for yul in my_receive]
             for r_txt in list_you:
                 mailado = add_ifin(r_txt)
                 if mailado:
                     kenmei = tem_ple['title_mail'].replace('namae', namae)
-                    send_gmail(tem_ple['formurl'], tem_ple['namae'], tem_ple['money'], mailado, kenmei)
+                    send_gmail(tem_ple['formurl'], tem_ple['namae'],
+                               tem_ple['money'], mailado, kenmei)
                     self.ik_msg(driver, tem_ple["after_mail"])
                     return None
 
@@ -632,15 +656,17 @@ class Ikkr:
         try:
             page_load(driver, "https://sp.194964.com/sns/snsashiato/show.html")
             wait.until(EC.presence_of_all_elements_located)
-            new_faces = driver.find_elements(By.XPATH,"//*[@id=\"tab1\"]//div[@class=\"type-list-name\"]/img")
+            new_faces = driver.find_elements(
+                By.XPATH, "//*[@id=\"tab1\"]//div[@class=\"type-list-name\"]/img")
             try:
                 new_face = new_faces[ppn]
             except IndexError:
                 return True
             exe_click(driver, "ok", new_faces[ppn])
             time.sleep(2)
-            #履歴確認
-            history_btn = driver.find_element(By.XPATH, "*//div[@class=\"user-profile-btn-history\"]").get_attribute('style')
+            # 履歴確認
+            history_btn = driver.find_element(
+                By.XPATH, "*//div[@class=\"user-profile-btn-history\"]").get_attribute('style')
             if "none" not in history_btn:
                 print('this user exist history. return')
                 return None
@@ -652,11 +678,12 @@ class Ikkr:
                 return None
             exe_click(driver, "id", "messageBtn")
             time.sleep(2)
-            #相手が年齢確認してないと定型文以外送れないので定型文を選択
+            # 相手が年齢確認してないと定型文以外送れないので定型文を選択
             exe_click(driver, "id", "message-d-1")
             # my_emojiSend(driver, "id", "send-message", asiato)
             time.sleep(1)
-            exe_click(driver, "xpath", "//*[@id=\"submitMessageButton\"]/button")
+            exe_click(driver, "xpath",
+                      "//*[@id=\"submitMessageButton\"]/button")
             time.sleep(1)
             # 0,足跡があるかないか
             return None
@@ -674,7 +701,8 @@ class Ikkr:
             slowClick(driver, "xpath", "//a[2]/img")
             wait.until(EC.presence_of_all_elements_located)
             yaunglist = []
-            agelist = driver.find_elements(By.XPATH,"//*[@id=\"tab1\"]//div[@class=\"type-list-age\"]")
+            agelist = driver.find_elements(
+                By.XPATH, "//*[@id=\"tab1\"]//div[@class=\"type-list-age\"]")
             for a in range(len(agelist)):
                 ages = re.sub("\\D", "", agelist[a].text)
                 if int(ages) < 35:
@@ -703,8 +731,6 @@ class Ikkr:
                 ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
             lg.exception(e)
             return None
-
-
 
     @pysnooper.snoop()
     def delete_mitya(self, driver):
@@ -738,7 +764,8 @@ class Ikkr:
 
         wait = WebDriverWait(driver, 10)
         try:
-            page_load(driver, "https://sp.194964.com/profile/profilesearch/show_profile_search.html")
+            page_load(
+                driver, "https://sp.194964.com/profile/profilesearch/show_profile_search.html")
             exe_click(driver, "id", "input_search_outer")
             exe_click(
                 driver, "xpath", "(//a[contains(text(),\"プロフィールを見る\")])[{0}]".format(ppn))
@@ -765,7 +792,8 @@ class Ikkr:
             else:
                 page_load(
                     driver, "https://sp.194964.com/sns/snssetting/show_image_register.html")
-                eximg = driver.find_elements(By.XPATH,"//*[@id='profileWarningBefore']/div")
+                eximg = driver.find_elements(
+                    By.XPATH, "//*[@id='profileWarningBefore']/div")
                 ex_num = re.sub("\\D", "", eximg[0].text)
                 if ex_num != "3":
                     return None
@@ -797,7 +825,8 @@ class Ikkr:
             time.sleep(1)
             wait.until(EC.presence_of_element_located(
                 (By.XPATH, "/html/body/article/form/div/div[1]/textarea")))
-            word_a = driver.find_element(By.XPATH,"/html/body/article/form/div/div[1]/textarea").text
+            word_a = driver.find_element(
+                By.XPATH, "/html/body/article/form/div/div[1]/textarea").text
             word_b = proftext
             profok = moji_hikaku(word_a, word_b)
             if profok == True:
@@ -831,14 +860,16 @@ class Ikkr:
             tem_ple["marriage"] = "未婚"
         myage = "{0}歳".format(tem_ple["age"])
         try:
-            page_load(driver, "https://sp.194964.com/config/settingprof/show_profile_setting.html")
+            page_load(
+                driver, "https://sp.194964.com/config/settingprof/show_profile_setting.html")
             time.sleep(2)
             wait.until(EC.element_to_be_clickable((By.NAME, "name")))
-            myname = driver.find_element(By.NAME, "name").get_attribute("Value")
+            myname = driver.find_element(
+                By.NAME, "name").get_attribute("Value")
             if myname in self.tem_ple["myname"]:
                 self.mydict.update({"namae": "ok"})
             else:
-                mySendkey(driver, "name", "name",self.tem_ple["myname"])
+                mySendkey(driver, "name", "name", self.tem_ple["myname"])
             select = Select(driver.find_element(By.NAME, "age"))
             age_now = select.all_selected_options[0].text
             if self.tem_ple["age"] in age_now:
@@ -846,9 +877,11 @@ class Ikkr:
             else:
                 select.select_by_visible_text(myage)
             with suppress(NoSuchElementException):
-                Select(driver.find_element(By.NAME, "height")).select_by_visible_text(tem_ple["height"])
+                Select(driver.find_element(By.NAME, "height")
+                       ).select_by_visible_text(tem_ple["height"])
             with suppress(NoSuchElementException):
-                Select(driver.find_element(By.NAME, "style")).select_by_visible_text(tem_ple["style"])
+                Select(driver.find_element(By.NAME, "style")
+                       ).select_by_visible_text(tem_ple["style"])
             with suppress(NoSuchElementException):
                 bloodtype = random.choice(range(4))
                 select = Select(driver.find_element(By.NAME, "blood"))
@@ -859,7 +892,8 @@ class Ikkr:
                 sind = random.randint(1, max_select)
                 select.select_by_index(sind)
             with suppress(NoSuchElementException):
-                Select(driver.find_element(By.NAME, "married")).select_by_visible_text(tem_ple["marriage"])
+                Select(driver.find_element(By.NAME, "married")
+                       ).select_by_visible_text(tem_ple["marriage"])
 
             wait.until(EC.element_to_be_clickable(
                 (By.XPATH, "/html/body/article/div/form//button[contains(text(), \"更新する\")]"))).submit()
@@ -892,8 +926,8 @@ class Ikkr:
             else:
                 select.select_by_visible_text(tem_ple["ik_job"])
             with suppress(NoSuchElementException):
-                Select(driver.find_element(By.NAME, 
-                    "income")).select_by_index(0)
+                Select(driver.find_element(By.NAME,
+                                           "income")).select_by_index(0)
             with suppress(NoSuchElementException):
                 select = Select(driver.find_element(By.NAME, "constellation"))
                 max_select = len(select.options) - 1
@@ -903,8 +937,8 @@ class Ikkr:
                 Select(driver.find_element(By.NAME, "cigarette")
                        ).select_by_visible_text("吸わない")
             with suppress(NoSuchElementException):
-                Select(driver.find_element(By.NAME, 
-                    "alcohol")).select_by_index(0)
+                Select(driver.find_element(By.NAME,
+                                           "alcohol")).select_by_index(0)
             with suppress(NoSuchElementException):
                 Select(driver.find_element(By.NAME, "child")
                        ).select_by_visible_text("いない")
@@ -912,11 +946,11 @@ class Ikkr:
                 Select(driver.find_element(By.NAME, "eyes")
                        ).select_by_visible_text("二重")
             with suppress(NoSuchElementException):
-                Select(driver.find_element(By.NAME, 
-                    "freeTime")).select_by_index(-1)
+                Select(driver.find_element(By.NAME,
+                                           "freeTime")).select_by_index(-1)
             with suppress(NoSuchElementException):
-                Select(driver.find_element(By.NAME, 
-                    "ageFrom")).select_by_index(1)
+                Select(driver.find_element(By.NAME,
+                                           "ageFrom")).select_by_index(1)
             with suppress(NoSuchElementException):
                 Select(driver.find_element(By.NAME, "ageTo")).select_by_index(5)
             wait.until(EC.element_to_be_clickable(
@@ -967,11 +1001,13 @@ class Ikkr:
             elem = "/html/body/article/div[2]/div[{0}]/a".format(myRum)
             exe_click(driver, "xpath", elem)
             time.sleep(3)
-            driver.get("https://sp.194964.com/profile/profilesearch/show_profile_search.html")
+            driver.get(
+                "https://sp.194964.com/profile/profilesearch/show_profile_search.html")
             time.sleep(4)
             exe_click(driver, "id", "city_button")
             time.sleep(4)
-            pref_elem = driver.find_elements(By.XPATH,"/html/body/article//input[@name='prefAndCity[]']")
+            pref_elem = driver.find_elements(
+                By.XPATH, "/html/body/article//input[@name='prefAndCity[]']")
             if len(pref_elem) != 0:
                 exe_click(
                     driver, "xpath", "/html/body/article//input[@name='prefAndCity[]']")
@@ -1049,7 +1085,7 @@ class Ikkr:
             wait.until(EC.element_to_be_clickable(
                 (By.XPATH, "//*[@id='form1']/div[2]/button"))).submit()
             wait.until(EC.presence_of_all_elements_located)
-            #time.sleep(3)
+            # time.sleep(3)
             #Select(driver.find_element(By.NAME, "ageTo")).select_by_index(3)
             time.sleep(2)
             exe_click(driver, "id", "input_search_outer")
@@ -1057,8 +1093,6 @@ class Ikkr:
         except (socket.timeout, NoSuchElementException, TimeoutException,
                 ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
             lg.exception(e)
-
-
 
     @pysnooper.snoop()
     def ik_aitai(self, driver):
@@ -1084,7 +1118,7 @@ class Ikkr:
             time.sleep(5)
             # element = driver.switch_to.active_element
             # element.find_element(By.ID, "successCalendar").click()
-            
+
             #slowClick(driver, "id", "successCalendar")
             time.sleep(3)
             return None
@@ -1092,8 +1126,6 @@ class Ikkr:
                 ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
             lg.exception(e)
             return None
-
-
 
     @pysnooper.snoop()
     def toko_mitya_check(self, driver):
