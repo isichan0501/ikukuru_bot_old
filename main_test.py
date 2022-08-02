@@ -212,15 +212,52 @@ if __name__ == "__main__":
     for loop_num, n in enumerate(ik_index):
         #テンプレ取得
         tem_ple = df.iloc[n,:]
-        if tem_ple['cnm'] != 'hiroko':
+        if tem_ple['cnm'] != 'mika':
             continue
         
-        is_main = super_main(tem_ple, main_loop=1)
-        import pdb;pdb.set_trace()
+        # is_main = super_main(tem_ple, main_loop=1)
+        # import pdb;pdb.set_trace()
         #---driver---
         driver = compose_driver(proxy_info=False, userdata_dir=None, use_profile=None, use_ua=tem_ple['ua'])
         ik = ik_helper.Ikkr(tem_ple)
         is_login = ik.login(driver)
+        is_img = ik.ik_profimg(driver)
+        if not is_img:
+            import pdb;pdb.set_trace()
+        ik.ik_prof1(driver)
+        ik.ik_prof2(driver)
+        ik.prof_text(driver)
+        ik.ik_basyo(driver)
+        #これは地域１つだけランダムで設定
+        # ik.ik_prof_basyo(driver)
+        #地方すべて選択
+        ik.ik_change_search_prof_area(driver)
+        is_toko = ik.toko_check(driver)
+        #足跡返し
+        # for ppn in range(5, 2, -1):
+        #     ik.asiato_kaesi(driver, ppn)
+
+        # #ユーザー検索から新規メール送信
+        # for ppn in range(10, 1, -1):
+        #     ik.search_user(driver, ppn)
+        
+        import pdb;pdb.set_trace()
+        #----メール返信
+        for i in range(30):
+            is_mail = ik.ik_mail(driver)
+            if is_mail:
+                break
+            import pdb;pdb.set_trace()
+    
+
+        #足跡返し
+        for ppn in range(5, 2, -1):
+            ik.asiato_kaesi(driver, ppn)
+
+        #ユーザー検索から新規メール送信
+        for ppn in range(10, 1, -1):
+            ik.search_user(driver, ppn)
+        import pdb;pdb.set_trace()
         is_mail = ik.ik_mail(driver)
 
         import pdb;pdb.set_trace()

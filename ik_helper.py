@@ -532,6 +532,7 @@ class Ikkr:
 
     @pysnooper.snoop()
     def ik_msg(self, driver, nakami):
+        wait = WebDriverWait(driver, 10)
         lg.debug(self.tem_ple['cnm'])
         try:
             # mySendkey(driver,"name","body",nakami)
@@ -543,6 +544,8 @@ class Ikkr:
             time.sleep(1)
             slowClick(
                 driver, "xpath", "//div[@id='popupContent']/div[2]/button")
+            time.sleep(2)
+            wait.until(EC.presence_of_all_elements_located)
         except (socket.timeout, NoSuchElementException, TimeoutException,
                 ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
             lg.exception(e)
@@ -648,19 +651,37 @@ class Ikkr:
             wait.until(EC.presence_of_all_elements_located)
             namae = driver.find_element(
                 By.XPATH, "//*[@id=\"title\"]/ul/li[2]").text
-            my_send = driver.find_elements(
-                By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
+            my_send = driver.find_elements(By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
             meruado = tem_ple['meruado'].replace('namae', namae)
             # もし自分の送信がなければ
             if len(my_send) == 0:
                 self.ik_msg(driver, meruado)
+                #送信メッセージが増えてるか（増えてなければ連投帰省中）
+                my_send_after = driver.find_elements(By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
+                if len(my_send) == len(my_send_after):
+                    # lg.debug('連投規制、スリープ２分')
+                    # time.sleep(60*2)
+                    #スタンプを送って連投規制を回避
+                    self.send_stamp(driver)
+                    self.ik_msg(driver, meruado)
+                
                 #行動記録を追加
                 self.action_data['meruado_otosi'] += 1
                 return None
 
+
             send_check = [m.text for m in my_send if moji_hikaku(m.text, meruado)]
             if len(send_check) == 0:
                 self.ik_msg(driver, meruado)
+
+                #送信メッセージが増えてるか（増えてなければ連投帰省中）
+                my_send_after = driver.find_elements(By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
+                if len(my_send) == len(my_send_after):
+                    # lg.debug('連投規制、スリープ２分')
+                    # time.sleep(60*2)
+                    #スタンプを送って連投規制を回避
+                    self.send_stamp(driver)
+                    self.ik_msg(driver, meruado)
                 #行動記録を追加
                 self.action_data['meruado_otosi'] += 1
                 return None
@@ -681,6 +702,15 @@ class Ikkr:
                     send_gmail(tem_ple['formurl'], tem_ple['namae'],
                                tem_ple['money'], mailado, kenmei)
                     self.ik_msg(driver, tem_ple["after_mail"])
+                    #送信メッセージが増えてるか（増えてなければ連投帰省中）
+                    my_send_after = driver.find_elements(By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
+                    if len(my_send) == len(my_send_after):
+                        # lg.debug('連投規制、スリープ２分')
+                        # time.sleep(60*2)
+                        #スタンプを送って連投規制を回避
+                        self.send_stamp(driver)
+                        self.ik_msg(driver, tem_ple["after_mail"])
+                    #行動記録を追加 
                     self.action_data['gmail'] += 1
                     return None
 
@@ -691,6 +721,27 @@ class Ikkr:
             lg.exception(e)
             return None
 
+
+    def send_stamp(self, driver):
+        """
+        メッセージ送受信ページで使う
+        """
+        wait = WebDriverWait(driver, 10)
+        lg.debug('stamp')
+        try:
+            #スタンプボタンを押す
+            exe_click(driver, "xpath", "//*[@id=\"icon-row\"]/a[3]")
+
+            #スタンプ履歴、猫スタンプ、ハムスタースタンプと選択肢があって最後のスタンプを選択
+            exe_click(driver, "xpath", "//*[@id=\"popupStampBox\"]/div[3]/ul/li[4]/a")
+            #スタンプのリストから選択,１ページ目に８個ある
+            random_stamp_number = random.randint(1,8)
+            #ランダムで選択
+            elem = "//*[@id=\"popupStampBox\"]/div[2]/div/a[{}]".format(random_stamp_number)
+            exe_click(driver, "xpath", elem)
+        except (socket.timeout, NoSuchElementException, TimeoutException,
+                ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
+            lg.exception(e)
 
 # 0,足跡があるかないか
 # 1,足跡なし　＝　足跡送信
