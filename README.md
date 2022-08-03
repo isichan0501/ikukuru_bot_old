@@ -22,3 +22,6 @@ Add the spreadsheet API token file (.json) used by the gspread library to the se
 BUCKET_NAME is the name of the s3 bucket where the image is stored.
 
 SHEET_KEY is the key of the spreadsheet where the template is saved
+
+
+setup.sh for amazonlinux
