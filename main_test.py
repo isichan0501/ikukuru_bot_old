@@ -7,7 +7,7 @@ from BotHelper.util_driver import compose_driver, twitter_login, ouath_twitter_n
 from BotHelper.util_driver import moji_hikaku, page_load, myClick, exe_click, mySendkey, slowClick, my_emojiSend, emoji_convert, add_ifin, send_gmail, mail_what, s3_img
 import pysnooper
 from importlib import reload
-import os
+import os, sys
 from contextlib import contextmanager
 
 from dotenv import load_dotenv
@@ -119,8 +119,8 @@ def mail_try(ik, driver):
     ik.ik_mail_new(driver)
         
 
-    #足跡返し
-    for ppn in range(5, 2, -1):
+    #足跡返し(ppnは2~21で指定)
+    for ppn in range(11, 2, -1):
         ik.asiato_kaesi(driver, ppn)
 
     #ユーザー検索から新規メール送信
@@ -203,13 +203,13 @@ if __name__ == "__main__":
     #イククルのIDのあるアカウントだけ
     df.dropna(subset=['cnm'], inplace=True)
     ik_index = df.loc[~df['ik'].isnull()].index
-    # img = s3_img()
     # import pdb;pdb.set_trace()
     
     for loop_num, n in enumerate(ik_index):
         #テンプレ取得
         tem_ple = df.iloc[n,:]
-        if tem_ple['cnm'] != 'hiroko':
+        #指定のキャラのみ
+        if len(sys.argv) == 2 and tem_ple['cnm'] != sys.argv[1]:
             continue
         
         # is_main = super_main(tem_ple, main_loop=1)
@@ -219,9 +219,11 @@ if __name__ == "__main__":
         ik = ik_helper.Ikkr(tem_ple)
         is_login = ik.login(driver)
 
-        # import pdb;pdb.set_trace()
+
+
         ik.ik_mail_new(driver)
         import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
 
         
         is_img = ik.ik_profimg(driver)
@@ -236,6 +238,8 @@ if __name__ == "__main__":
         #地方すべて選択
         ik.ik_change_search_prof_area(driver)
         is_toko = ik.toko_check(driver)
+        import pdb;pdb.set_trace()
+        ik.retoko(driver, pure_adlut="adult")
         #足跡返し
         # for ppn in range(5, 2, -1):
         #     ik.asiato_kaesi(driver, ppn)
@@ -244,7 +248,7 @@ if __name__ == "__main__":
         # for ppn in range(10, 1, -1):
         #     ik.search_user(driver, ppn)
         
-        import pdb;pdb.set_trace()
+
         #----メール返信
         for i in range(30):
             is_mail = ik.ik_mail(driver)
@@ -263,37 +267,9 @@ if __name__ == "__main__":
         import pdb;pdb.set_trace()
         is_mail = ik.ik_mail(driver)
 
-        import pdb;pdb.set_trace()
-        # ik.toko_check(driver)
-        # import pdb;pdb.set_trace()
-        ik.ik_change_search_prof_area(driver)
-        import pdb;pdb.set_trace()
-        ik.ik_prof1(driver)
-        import pdb;pdb.set_trace()
-        ik.ik_prof2(driver)
-        import pdb;pdb.set_trace()
-        ik.prof_text(driver)
-        ik.ik_basyo(driver)
-        ik.ik_prof_basyo(driver)
 
 
 
-        #投稿を確認してなければ投稿
-        ik.toko_check(driver)
-
-        #----メール返信
-        for i in range(30):
-            is_mail = ik.ik_mail(driver)
-            if is_mail:
-                break
-
-        #足跡返し
-        for ppn in range(10, 2, -1):
-            ik.asiato_kaesi(driver, ppn)
-
-        #ユーザー検索から新規メール送信
-        for ppn in range(10, 1, -1):
-            ik.search_user(driver, ppn)
 
 
         import pdb;pdb.set_trace()

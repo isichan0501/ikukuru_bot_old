@@ -381,8 +381,7 @@ class Ikkr:
             basyo_num = self.basyo_change(basyo)
             driver.get("https://sp.194964.com/menu.html")
             time.sleep(2)
-            slowClick(
-                driver, "xpath", "//a[@href='/bbs/show_bbs.html']")
+            slowClick(driver, "xpath", "//a[@href='/bbs/show_bbs.html']")
             time.sleep(2)
             slowClick(driver, "link_text", "地域を移動")
             time.sleep(2)
@@ -398,15 +397,12 @@ class Ikkr:
             exe_click(driver, "xpath", toko_elem)
             time.sleep(2)
 
-            last_toko = driver.find_elements(
-                By.XPATH, "//div[@class=\"bgMiddle btn\"]//div[@class=\"contentsContribute\"]/a")
+            last_toko = driver.find_elements(By.XPATH, "//div[@class=\"bgMiddle btn\"]//div[@class=\"contentsContribute\"]/a")
             driver.execute_script("arguments[0].click();", last_toko[-1])
             time.sleep(2)
-            saitoko = driver.find_elements(
-                By.XPATH, "/html/body/article//form/button[@type='submit' and contains(text(), '再投稿する')]")
+            saitoko = driver.find_elements(By.XPATH, "/html/body/article//form/button[@type='submit' and contains(text(), '再投稿する')]")
             if len(saitoko) == 0:
-                hensyu = driver.find_elements(
-                    By.XPATH, "/html/body/article//form/button[contains(text(), \"編集する\")]")
+                hensyu = driver.find_elements(By.XPATH, "/html/body/article//form/button[contains(text(), \"編集する\")]")
                 if len(hensyu) != 0:
                     hensyu[0].submit()
                     time.sleep(2)
@@ -414,6 +410,11 @@ class Ikkr:
                         driver, "xpath", "//*[@id=\"formID\"]/div/button[contains(text(), \"募集する\")]")
 
                 else:
+                    #時間制限の確認
+                    repost_limit_time = driver.find_element(By.XPATH, "/html/body/article//form[1]/button").text
+                    lg.debug(repost_limit_time)
+                    if 'から再投稿できます' in repost_limit_time:
+                        return True
                     delete_elem = driver.find_elements(
                         By.XPATH, "/html/body/article//form/button[contains(text(), \"削除する\")]")
                     if len(delete_elem) != 0:
@@ -662,6 +663,10 @@ class Ikkr:
         tem_ple = self.tem_ple
         wait = WebDriverWait(driver, 10)
         lg.debug('move to page {}'.format(page_number))
+        #最初のページで終わりなので
+        if page_number == 0:
+            return True
+            
         try:
             #メッセージページか確認
             if 'mail/inbox/show_mailbox' not in driver.current_url:
@@ -707,6 +712,10 @@ class Ikkr:
                 new_msg_elem = driver.find_elements(By.CLASS_NAME, "icon-new")
                 #なければ前のページへ
                 if len(new_msg_elem) == 0:
+                    #0ページ（最初のページ）で且つnewアイコンもなければ終了
+                    if page_number == 0:
+                        lg.debug('message is end')
+                        return True
                     page_number -= 1
                     self.move_to_page_number(driver, page_number)
                     now_url = driver.current_url
@@ -1017,12 +1026,12 @@ class Ikkr:
                 lg.debug('this user exist history. return')
                 return None
             namae = driver.find_element(By.ID, "titleNickname").text
-            hajime = tem_ple["hajime"].replace('namae', namae)
+            asiato = tem_ple["asiato"].replace('namae', namae)
 
             #send message
             exe_click(driver, "id", "messageBtn")
             time.sleep(2)
-            my_emojiSend(driver, "id", "send-message", hajime)
+            my_emojiSend(driver, "id", "send-message", asiato)
             time.sleep(1)
             exe_click(driver, "xpath","//*[@id=\"submitMessageButton\"]/button")
             time.sleep(1)
@@ -1392,32 +1401,7 @@ class Ikkr:
             elem = "/html/body/article/div[2]/div[{0}]/a".format(myRum)
             exe_click(driver, "xpath", elem)
             time.sleep(3)
-            # driver.get(
-            #     "https://sp.194964.com/profile/profilesearch/show_profile_search.html")
-            # time.sleep(4)
-            # exe_click(driver, "id", "city_button")
-            # time.sleep(4)
-            # pref_elem = driver.find_elements(
-            #     By.XPATH, "/html/body/article//input[@name='prefAndCity[]']")
-            # if len(pref_elem) != 0:
-            #     exe_click(
-            #         driver, "xpath", "/html/body/article//input[@name='prefAndCity[]']")
-            #     time.sleep(1)
-            #     wait.until(EC.element_to_be_clickable(
-            #         (By.XPATH, "//*[@id='prefAndCity']/div[2]/button"))).submit()
-            #     time.sleep(2)
-            #     exe_click(driver, "id", "city_button")
-            #     time.sleep(2)
-            # bnm = int(self.basyo_change(basyo)) + 3
-            # elem = "/html/body/article/div[1]/div[{0}]/a".format(bnm)
-            # exe_click(driver, "xpath", elem)
-            # time.sleep(3)
-            # driver.find_element(By.ID, "checkbox1").click()
-            # driver.execute_script("scrollBy(0,1200);")
-            # wait.until(EC.element_to_be_clickable(
-            #     (By.XPATH, "//*[@id='form1']/div[2]/button"))).submit()
-            # time.sleep(2)
-            # exe_click(driver, "id", "input_search_outer")
+
             return True
         except (socket.timeout, NoSuchElementException, TimeoutException,
                 ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:

@@ -8,6 +8,7 @@ from BotHelper.util_driver import moji_hikaku, page_load, myClick, exe_click, my
 import pysnooper
 from importlib import reload
 import os
+import sys
 from contextlib import contextmanager
 
 from dotenv import load_dotenv
@@ -120,7 +121,7 @@ def mail_try(ik, driver):
         
 
     #足跡返し
-    for ppn in range(5, 2, -1):
+    for ppn in range(11, 2, -1):
         ik.asiato_kaesi(driver, ppn)
 
     #ユーザー検索から新規メール送信
@@ -203,13 +204,14 @@ if __name__ == "__main__":
     #イククルのIDのあるアカウントだけ
     df.dropna(subset=['cnm'], inplace=True)
     ik_index = df.loc[~df['ik'].isnull()].index
-    # img = s3_img()
+    
+    # len(sys.argv)
     # import pdb;pdb.set_trace()
     
     for loop_num, n in enumerate(ik_index):
         #テンプレ取得
         tem_ple = df.iloc[n,:]
-        if tem_ple['cnm'] != 'hiroko':
+        if tem_ple['cnm'] != 'mika':
             continue
         
         is_main = super_main(tem_ple, main_loop=1)

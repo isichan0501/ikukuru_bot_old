@@ -347,7 +347,7 @@ def send_keys(driver, element, key):
         .send_keys_to_element(element, Keys.ENTER).perform()
 
 
-@pysnooper.snoop()
+# @pysnooper.snoop()
 def emoji_convert(texts):
     mytxt = texts
     for ppn in range(20):
@@ -359,7 +359,7 @@ def emoji_convert(texts):
             return mytxt
 
 
-@pysnooper.snoop()
+# @pysnooper.snoop()
 def emoji_send(driver, x_elem, texts):
     JS_ADD_TEXT_TO_INPUT = """
     console.log( "start" );
@@ -382,7 +382,7 @@ def emoji_send(driver, x_elem, texts):
         print(e)
 
 
-@pysnooper.snoop()
+# @pysnooper.snoop()
 def my_emojiSend(driver, by, desc, my_word):
     wait = WebDriverWait(driver, 10)
     time.sleep(1)
@@ -435,7 +435,7 @@ def my_emojiSend(driver, by, desc, my_word):
         print(ex)
         
 
-@pysnooper.snoop()
+# @pysnooper.snoop()
 def send_gmail(formurl, sender_name, money, mailado, kenmei):
     #フォームURLが複数あればランダムで１つ選ぶ
     form_urls = formurl.split(',')
@@ -638,7 +638,7 @@ def compose_driver(proxy_info=None, userdata_dir=None, use_profile=None, use_ua=
         co.add_argument('--user-agent={0}'.format(use_ua))
         co.add_argument("--window-size=393,851")
     
-    driver = uc.Chrome(options=co)
+    driver = uc.Chrome(executable_path=ChromeDriverManager().install(),options=co)
     driver.implicitly_wait(10)
     driver.set_page_load_timeout(60)
     return driver
