@@ -168,7 +168,7 @@ class Ikkr:
             return 21
         if '埼玉' in namae:
             return 22
-        if '茨木' in namae:
+        if '茨城' in namae:
             return 23
         if '栃木' in namae:
             return 24
@@ -702,8 +702,10 @@ class Ikkr:
             
             #1ページに10通メッセージがあるのでunread_messege_count÷10(切り上げ)
             page_number = -(-unread_messege_count // 10)
-            #. +余分に何ページか移動するため
-            page_number += 5
+            #. +余分に何ページか移動するため.
+            #移動ページできるページ数とelemの数が一致する
+            elem = driver.find_elements(By.XPATH, "/html/body/article//li[@class=\"listPaginator2 button\"]/a")
+            page_number += len(elem)
             #指定した数字(新規メッセージの最終）のページに移動
             self.move_to_page_number(driver, page_number)
             #現在のページURLを取得しておく
@@ -1488,7 +1490,7 @@ class Ikkr:
         lg.debug(tem_ple["cnm"])
         random.seed()
         area_list = self.get_area_list()
-        basyo = random.choice(area_list)
+        #basyo = random.choice(area_list)
         # myadd = tem_ple["area"]
         # if any(map(tem_ple["area"].__contains__, ("名古屋", "愛知", "岐阜", "三重", "長野", "静岡", "愛知県", "岐阜県", "三重県", "長野県", "静岡県"))):
         #     area_list = ['愛知', '静岡', '岐阜', '三重', '長野']
@@ -1513,13 +1515,16 @@ class Ikkr:
             if len(area_text_element) != 0:
                 area_text = area_text_element[0].text
                 area_check = [basyo for basyo in area_list if basyo in area_text]
-                if len(area_check) == len(area_list):
+                #area_listの中で選択されてないのだけに絞る
+                area_list = list(set(area_list) - set(area_check))
+                if len(area_list) == 0:
                     print('area ok.return True')
                     return True
+                
+                
             #もし既に検索地域が設定されていたら削除
-            pref_elem = driver.find_elements(
-                By.XPATH, "/html/body/article//input[@name='prefAndCity[]']")
-            if len(pref_elem) != 0:
+            pref_elem = driver.find_elements(By.XPATH, "/html/body/article//input[@name='prefAndCity[]']")
+            if len(pref_elem) == 1:
                 exe_click(driver, "xpath", "/html/body/article//input[@name='prefAndCity[]']")
                 time.sleep(1)
                 wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='prefAndCity']/div[2]/button"))).submit()

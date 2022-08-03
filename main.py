@@ -120,14 +120,17 @@ def mail_try(ik, driver):
     ik.ik_mail_new(driver)
         
 
-    #足跡返し
-    for ppn in range(11, 2, -1):
+    #足跡返し(ppnは2~21で指定)
+    for ppn in range(7, 2, -1):
         ik.asiato_kaesi(driver, ppn)
 
     #ユーザー検索から新規メール送信
     for ppn in range(10, 1, -1):
         ik.search_user(driver, ppn)
 
+    #ユーザー検索から新規メール送信
+    for ppn in range(10, 1, -1):
+        ik.search_user(driver, ppn)
 
 def initial_setting(ik, driver):
     """
@@ -214,4 +217,4 @@ if __name__ == "__main__":
         if len(sys.argv) == 2 and tem_ple['cnm'] != sys.argv[1]:
             continue
         
-        is_main = super_main(tem_ple, main_loop=1)
+        is_main = super_main(tem_ple, main_loop=100)

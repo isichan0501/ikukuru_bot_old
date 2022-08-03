@@ -120,13 +120,16 @@ def mail_try(ik, driver):
         
 
     #足跡返し(ppnは2~21で指定)
-    for ppn in range(11, 2, -1):
+    for ppn in range(7, 2, -1):
         ik.asiato_kaesi(driver, ppn)
 
     #ユーザー検索から新規メール送信
     for ppn in range(10, 1, -1):
         ik.search_user(driver, ppn)
 
+    #ユーザー検索から新規メール送信
+    for ppn in range(10, 1, -1):
+        ik.search_user(driver, ppn)
 
 def initial_setting(ik, driver):
     """
@@ -212,7 +215,7 @@ if __name__ == "__main__":
         if len(sys.argv) == 2 and tem_ple['cnm'] != sys.argv[1]:
             continue
         
-        # is_main = super_main(tem_ple, main_loop=1)
+        # is_main = super_main(tem_ple, main_loop=100)
         # import pdb;pdb.set_trace()
         #---driver---
         driver = compose_driver(proxy_info=False, userdata_dir=None, use_profile=None, use_ua=tem_ple['ua'])
@@ -239,23 +242,13 @@ if __name__ == "__main__":
         ik.ik_change_search_prof_area(driver)
         is_toko = ik.toko_check(driver)
         import pdb;pdb.set_trace()
-        ik.retoko(driver, pure_adlut="adult")
-        #足跡返し
-        # for ppn in range(5, 2, -1):
-        #     ik.asiato_kaesi(driver, ppn)
+        ik.ik_mail_new(driver)
 
-        # #ユーザー検索から新規メール送信
-        # for ppn in range(10, 1, -1):
-        #     ik.search_user(driver, ppn)
+        import pdb;pdb.set_trace()
+        ik.retoko(driver, pure_adlut="adult")
+
         
 
-        #----メール返信
-        for i in range(30):
-            is_mail = ik.ik_mail(driver)
-            if is_mail:
-                break
-            import pdb;pdb.set_trace()
-    
 
         #足跡返し
         for ppn in range(5, 2, -1):
@@ -265,31 +258,3 @@ if __name__ == "__main__":
         for ppn in range(10, 1, -1):
             ik.search_user(driver, ppn)
         import pdb;pdb.set_trace()
-        is_mail = ik.ik_mail(driver)
-
-
-
-
-
-
-        import pdb;pdb.set_trace()
-        #pure or adultを引数に
-        ik.retoko(driver, pure_adlut="pure")
-        ik.asipeta(driver, 3)
-        #asiato
-        for ppn in range(3):
-            is_asiato = ik.asiato_newface(driver, ppn)
-            if is_asiato:
-                break
-        
-        # #画像設定されていたらTrue、その場合のみ投稿やメッセージ返信に進む
-        # is_img = ik.ik_profimg(driver)
-        # ik.ik_prof1(driver)
-        # ik.ik_prof2(driver)
-        # ik.prof_text(driver)
-        # ik.ik_basyo(driver)
-        # ik.ik_prof_basyo(driver)
-        # ik.toko_check(driver)
-        
-        import pdb;pdb.set_trace()
-        # driver.quit()
