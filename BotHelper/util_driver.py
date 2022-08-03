@@ -35,6 +35,7 @@ import random
 import unicodedata, difflib
 import boto3
 import subprocess
+import platform
 from dotenv import load_dotenv
 lg = logging.getLogger(__name__)
 import copy
@@ -637,12 +638,20 @@ def compose_driver(proxy_info=None, userdata_dir=None, use_profile=None, use_ua=
     if use_ua:
         co.add_argument('--user-agent={0}'.format(use_ua))
         co.add_argument("--window-size=393,851")
-    
-    driver = uc.Chrome(executable_path=ChromeDriverManager().install(),options=co)
+
+    #linuxだとchromeの最新バージョンいれれないので、ChromeDriverManagerを使うかの分岐
+    #amazonlinuxで使うときはchromedriverを同じディレクトリに
+    ch_r = [os.path.join(os.path.abspath(
+        os.path.dirname(__file__))), 'chromedriver']
+    chrome_driver = os.path.join(*ch_r)
+    is_driver = os.path.exists(chrome_driver)
+    if is_driver:
+        driver = uc.Chrome(driver_executable_path=chrome_driver,options=co)
+    else:
+        driver = uc.Chrome(driver_executable_path=ChromeDriverManager().install(),options=co)
     driver.implicitly_wait(10)
     driver.set_page_load_timeout(60)
     return driver
-
 
 @pysnooper.snoop()
 def http_check(driver):
