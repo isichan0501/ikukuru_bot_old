@@ -40,7 +40,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 
-from BotHelper.util_driver import page_load, myClick, exe_click, mySendkey
+from BotHelper.util_driver import page_load, myClick, exe_click, mySendkey,send_gmail
 #-----debug---------
 
 
@@ -115,11 +115,8 @@ def main(tem_ple):
 def mail_try(ik, driver):
     #メール返信、足跡返し、新規メール
     
-    #----メール返信
-    for i in range(30):
-        is_mail = ik.ik_mail(driver)
-        if is_mail:
-            break
+    #----メール返信,未読なくなるまで
+    ik.ik_mail_new(driver)
         
 
     #足跡返し
@@ -212,7 +209,7 @@ if __name__ == "__main__":
     for loop_num, n in enumerate(ik_index):
         #テンプレ取得
         tem_ple = df.iloc[n,:]
-        if tem_ple['cnm'] != 'mika':
+        if tem_ple['cnm'] != 'hiroko':
             continue
         
         # is_main = super_main(tem_ple, main_loop=1)
@@ -221,6 +218,12 @@ if __name__ == "__main__":
         driver = compose_driver(proxy_info=False, userdata_dir=None, use_profile=None, use_ua=tem_ple['ua'])
         ik = ik_helper.Ikkr(tem_ple)
         is_login = ik.login(driver)
+
+        # import pdb;pdb.set_trace()
+        ik.ik_mail_new(driver)
+        import pdb;pdb.set_trace()
+
+        
         is_img = ik.ik_profimg(driver)
         if not is_img:
             import pdb;pdb.set_trace()

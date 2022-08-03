@@ -40,7 +40,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 
-from BotHelper.util_driver import page_load, myClick, exe_click, mySendkey
+from BotHelper.util_driver import page_load, myClick, exe_click, mySendkey,send_gmail
 #-----debug---------
 
 
@@ -115,11 +115,8 @@ def main(tem_ple):
 def mail_try(ik, driver):
     #メール返信、足跡返し、新規メール
     
-    #----メール返信
-    for i in range(30):
-        is_mail = ik.ik_mail(driver)
-        if is_mail:
-            break
+    #----メール返信,未読なくなるまで
+    ik.ik_mail_new(driver)
         
 
     #足跡返し
@@ -215,4 +212,4 @@ if __name__ == "__main__":
         if tem_ple['cnm'] != 'hiroko':
             continue
         
-        is_main = super_main(tem_ple, main_loop=100)
+        is_main = super_main(tem_ple, main_loop=1)

@@ -613,44 +613,146 @@ class Ikkr:
             lg.exception(e)
             return None
 
+
+
+    #未読メッセージのみ表示させれないのでメッセージが大量にあった場合にページ移動をうまくするためのヘルパー関数
     @pysnooper.snoop()
-    def ik_mail(self, driver):
+    def get_unread_message_count(self, driver):
+        """
+        Returns:
+            int: 未読メッセージ数
+        """
         tem_ple = self.tem_ple
         wait = WebDriverWait(driver, 10)
         try:
-            page_load(
-                driver, "https://sp.194964.com/mail/inbox/show_mailbox.html")
+            page_load(driver, "https://sp.194964.com/mail/inbox/show_mailbox.html")
             elm = driver.find_element(By.XPATH, "/html/body/nav/div[3]").text
-            ex_mg = re.sub("\\D", "", elm)
-            if not ex_mg:
-                return True
-            for i in range(2, 5, 1):
-                if 4 < i:
-                    exe_click(driver, "xpath",
-                              "/html/body/article/div[1]/div[1]/a")
-                    driver.execute_script("scrollBy(0,1200);")
-                    wait.until(
-                        EC.element_to_be_clickable((By.XPATH, "/html/body/article/div[2]/form[2]/div/button"))).submit()
-                    wait.until(EC.presence_of_all_elements_located)
-                    wait.until(EC.element_to_be_clickable(
-                        (By.XPATH, "/html/body/article/div/form[1]/button"))).submit()
-                    wait.until(EC.presence_of_all_elements_located)
-                    return True
-                driver.execute_script("scrollBy(0,200);")
-                new_img = driver.find_elements(
-                    By.XPATH, "//div[@class=\"bgMiddle btn \"]//span[@class=\"icon-new-box\"]")
-                if not new_img:
-                    tugi = driver.find_element(By.LINK_TEXT, "{}".format(i))
-                    driver.execute_script("arguments[0].click();", tugi)
-                    continue
-                else:
-                    driver.execute_script("arguments[0].click();", new_img[-1])
-                    break
+            unread_messege_count = re.sub("\\D", "", elm)
+            #なかったら0を返す
+            if not unread_messege_count:
+                unread_messege_count = 0
+            lg.debug('unread message is {}'.format(unread_messege_count))
+            return int(unread_messege_count)
+        except (socket.timeout, NoSuchElementException, TimeoutException,
+                ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
+            lg.exception(e)
+            return None
 
+
+    def get_unread_message_count_test(self, driver):
+    
+        try:
+            page_load(driver, "https://sp.194964.com/mail/inbox/show_mailbox.html")
+            return 100
+            
+        except (socket.timeout, NoSuchElementException, TimeoutException,
+                ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
+            lg.exception(e)
+            return None
+
+    @pysnooper.snoop()
+    def move_to_page_number(self, driver, page_number):
+        """受信メッセージでページ数指定で移動する関数
+        
+        Args:
+            int: 移動するページ
+        Returns:
+            int: 指定したページのURL
+        """
+        tem_ple = self.tem_ple
+        wait = WebDriverWait(driver, 10)
+        lg.debug('move to page {}'.format(page_number))
+        try:
+            #メッセージページか確認
+            if 'mail/inbox/show_mailbox' not in driver.current_url:
+                page_load(driver, "https://sp.194964.com/mail/inbox/show_mailbox.html")
+            #ページ移動のボタン
+            elem = driver.find_elements(By.LINK_TEXT, str(page_number))
+            #なければ最終ページへ
+            if len(elem) == 0:
+                elem = driver.find_elements(By.XPATH, "/html/body/article//li[@class=\"listPaginator2 button\"]/a")
+                driver.get(elem[-1].get_attribute('href'))
+                self.move_to_page_number(driver, page_number)
+            #移動するページのURL
+            page_url = elem[0].get_attribute('href')
+            page_load(driver, page_url)
+        except (socket.timeout, NoSuchElementException, TimeoutException,
+                ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
+            lg.exception(e)
+            return None
+
+
+
+    @pysnooper.snoop()
+    def ik_mail_new(self, driver):
+        tem_ple = self.tem_ple
+        wait = WebDriverWait(driver, 10)
+        try:
+            #未読メッセージ数を取得。0なら終了
+            unread_messege_count = self.get_unread_message_count(driver)
+            if not unread_messege_count:
+                lg.debug('message is end.')
+                return True
+            
+            #1ページに10通メッセージがあるのでunread_messege_count÷10(切り上げ)
+            page_number = -(-unread_messege_count // 10)
+            #. +余分に何ページか移動するため
+            page_number += 5
+            #指定した数字(新規メッセージの最終）のページに移動
+            self.move_to_page_number(driver, page_number)
+            #現在のページURLを取得しておく
+            now_url = driver.current_url
+            while 0 < page_number:
+                #新規メッセージ（NEWアイコンのあるのを選択)
+                new_msg_elem = driver.find_elements(By.CLASS_NAME, "icon-new")
+                #なければ前のページへ
+                if len(new_msg_elem) == 0:
+                    page_number -= 1
+                    self.move_to_page_number(driver, page_number)
+                    now_url = driver.current_url
+                    continue
+
+                exe_click(driver, "ok", new_msg_elem[-1])
+                self.reply_message(driver)
+                page_load(driver, now_url)
+            
+        except (socket.timeout, NoSuchElementException, TimeoutException,
+                ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
+            lg.exception(e)
+            return None
+
+    @pysnooper.snoop()
+    def send_email_until_success(self, mailado, kenmei, retry_count=3):
+        tem_ple = self.tem_ple
+        try:
+            #送信に成功したTrueがかえってくる
+            for i in range(retry_count):
+                is_gmail = send_gmail(tem_ple['formurl'], tem_ple['namae'],tem_ple['money'], mailado, kenmei)
+                if is_gmail:
+                    lg.debug('gmail to {} is success!'.format(mailado))
+                    break
+        except (socket.timeout, NoSuchElementException, TimeoutException,
+                ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
+            lg.exception(e)
+            return None
+        
+    @pysnooper.snoop()
+    def reply_message(self, driver):
+        """
+        メッセージページに移動してから
+
+        Args:
+            driver (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        tem_ple = self.tem_ple
+        wait = WebDriverWait(driver, 10)
+        try:
             # メッセージ送信
             wait.until(EC.presence_of_all_elements_located)
-            namae = driver.find_element(
-                By.XPATH, "//*[@id=\"title\"]/ul/li[2]").text
+            namae = driver.find_element(By.XPATH, "//*[@id=\"title\"]/ul/li[2]").text
             my_send = driver.find_elements(By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
             meruado = tem_ple['meruado'].replace('namae', namae)
             # もし自分の送信がなければ
@@ -699,8 +801,113 @@ class Ikkr:
                 mailado = add_ifin(r_txt)
                 if mailado:
                     kenmei = tem_ple['title_mail'].replace('namae', namae)
-                    send_gmail(tem_ple['formurl'], tem_ple['namae'],
-                               tem_ple['money'], mailado, kenmei)
+                    self.send_email_until_success(mailado, kenmei)
+                    self.ik_msg(driver, tem_ple["after_mail"])
+                    #送信メッセージが増えてるか（増えてなければ連投帰省中）
+                    my_send_after = driver.find_elements(By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
+                    if len(my_send) == len(my_send_after):
+                        # lg.debug('連投規制、スリープ２分')
+                        # time.sleep(60*2)
+                        #スタンプを送って連投規制を回避
+                        self.send_stamp(driver)
+                        self.ik_msg(driver, tem_ple["after_mail"])
+                    #行動記録を追加 
+                    self.action_data['gmail'] += 1
+                    return None
+
+
+            return None
+        except (socket.timeout, NoSuchElementException, TimeoutException,
+                ElementClickInterceptedException, ElementNotInteractableException, Exception) as e:
+            lg.exception(e)
+            return None
+
+        
+    @pysnooper.snoop()
+    def ik_mail(self, driver):
+        tem_ple = self.tem_ple
+        wait = WebDriverWait(driver, 10)
+        try:
+            page_load(driver, "https://sp.194964.com/mail/inbox/show_mailbox.html")
+            elm = driver.find_element(By.XPATH, "/html/body/nav/div[3]").text
+            ex_mg = re.sub("\\D", "", elm)
+            if not ex_mg:
+                return True
+            for i in range(2, 5, 1):
+                if 4 < i:
+                    exe_click(driver, "xpath",
+                              "/html/body/article/div[1]/div[1]/a")
+                    driver.execute_script("scrollBy(0,1200);")
+                    wait.until(
+                        EC.element_to_be_clickable((By.XPATH, "/html/body/article/div[2]/form[2]/div/button"))).submit()
+                    wait.until(EC.presence_of_all_elements_located)
+                    wait.until(EC.element_to_be_clickable(
+                        (By.XPATH, "/html/body/article/div/form[1]/button"))).submit()
+                    wait.until(EC.presence_of_all_elements_located)
+                    return True
+                driver.execute_script("scrollBy(0,200);")
+                new_img = driver.find_elements(
+                    By.XPATH, "//div[@class=\"bgMiddle btn \"]//span[@class=\"icon-new-box\"]")
+                if not new_img:
+                    tugi = driver.find_element(By.LINK_TEXT, "{}".format(i))
+                    driver.execute_script("arguments[0].click();", tugi)
+                    continue
+                else:
+                    driver.execute_script("arguments[0].click();", new_img[-1])
+                    break
+
+            # メッセージ送信
+            wait.until(EC.presence_of_all_elements_located)
+            namae = driver.find_element(By.XPATH, "//*[@id=\"title\"]/ul/li[2]").text
+            my_send = driver.find_elements(By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
+            meruado = tem_ple['meruado'].replace('namae', namae)
+            # もし自分の送信がなければ
+            if len(my_send) == 0:
+                self.ik_msg(driver, meruado)
+                #送信メッセージが増えてるか（増えてなければ連投帰省中）
+                my_send_after = driver.find_elements(By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
+                if len(my_send) == len(my_send_after):
+                    # lg.debug('連投規制、スリープ２分')
+                    # time.sleep(60*2)
+                    #スタンプを送って連投規制を回避
+                    self.send_stamp(driver)
+                    self.ik_msg(driver, meruado)
+                
+                #行動記録を追加
+                self.action_data['meruado_otosi'] += 1
+                return None
+
+
+            send_check = [m.text for m in my_send if moji_hikaku(m.text, meruado)]
+            if len(send_check) == 0:
+                self.ik_msg(driver, meruado)
+
+                #送信メッセージが増えてるか（増えてなければ連投帰省中）
+                my_send_after = driver.find_elements(By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")
+                if len(my_send) == len(my_send_after):
+                    # lg.debug('連投規制、スリープ２分')
+                    # time.sleep(60*2)
+                    #スタンプを送って連投規制を回避
+                    self.send_stamp(driver)
+                    self.ik_msg(driver, meruado)
+                #行動記録を追加
+                self.action_data['meruado_otosi'] += 1
+                return None
+            
+            last_message = my_send[-1].text.replace('★プロフィールから送信', '')
+            if moji_hikaku(last_message, tem_ple["after_mail"]):
+                lg.debug('this user after mail sended.')
+                return None
+
+            my_receive = driver.find_elements(
+                By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_other\"]")
+            list_you = [yul.text.replace('★プロフィールから送信', '')
+                        for yul in my_receive]
+            for r_txt in list_you:
+                mailado = add_ifin(r_txt)
+                if mailado:
+                    kenmei = tem_ple['title_mail'].replace('namae', namae)
+                    send_gmail(tem_ple['formurl'], tem_ple['namae'],tem_ple['money'], mailado, kenmei)
                     self.ik_msg(driver, tem_ple["after_mail"])
                     #送信メッセージが増えてるか（増えてなければ連投帰省中）
                     my_send_after = driver.find_elements(By.XPATH, "//*[@id=\"mailboxList\"]//div[@class=\"bubble_owner\"]")

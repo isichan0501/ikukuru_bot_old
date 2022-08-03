@@ -435,6 +435,7 @@ def my_emojiSend(driver, by, desc, my_word):
         print(ex)
         
 
+@pysnooper.snoop()
 def send_gmail(formurl, sender_name, money, mailado, kenmei):
     #フォームURLが複数あればランダムで１つ選ぶ
     form_urls = formurl.split(',')
@@ -466,6 +467,8 @@ def send_gmail(formurl, sender_name, money, mailado, kenmei):
     except(socket.timeout, NoSuchElementException, TimeoutException, Exception):
         driver.quit()
         return False
+
+
 
 # list_you = 会話履歴,namaeは客の名前,asi_if=falseで足跡テンプレは送らない
 # @pysnooper.snoop()
