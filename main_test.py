@@ -208,7 +208,7 @@ if __name__ == "__main__":
     for loop_num, n in enumerate(ik_index):
         #テンプレ取得
         tem_ple = df.iloc[n,:]
-        #指定のキャラのみ
+        #指定のアカウントのみ
         if len(sys.argv) == 2 and tem_ple['cnm'] != sys.argv[1]:
             continue
         
@@ -221,7 +221,7 @@ if __name__ == "__main__":
 
 
 
-        ik.ik_mail_new(driver)
+        # ik.ik_mail_new(driver)
         import pdb;pdb.set_trace()
         # import pdb;pdb.set_trace()
 

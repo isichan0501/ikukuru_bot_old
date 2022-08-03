@@ -226,7 +226,8 @@ class Ikkr:
         lg.debug(self.tem_ple["cnm"])
         junList = ["今から遊ぼ", "すぐ会いたい", "大人の出会い", "友達・恋人・合コン", "アブノーマル"]
         selected_junls = []
-        basyo = ""
+        area_list = self.get_area_list()
+        basyo = random.choice(area_list)
         random.seed()
         try:
             page_load(driver, "https://sp.194964.com/bbs/show_bbs_write_list.html")
@@ -254,23 +255,23 @@ class Ikkr:
                 driver, "https://sp.194964.com/other/area/show_pref_setting_list.html")
             wait.until(EC.visibility_of_element_located(
                 (By.XPATH, "/html/body/article/div[1]/span[2]")))
-            myadd = driver.find_element(By.XPATH,
-                                        "/html/body/article/div[1]/span[2]").text
-            if any(map(tem_ple["area"].__contains__, ("名古屋", "愛知", "岐阜", "三重", "長野", "静岡"))):
-                basyo = random.choice(
-                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "愛知", "愛知", "愛知", "愛知", "長野", "三重", "岐阜", "静岡"])
-            elif any(map(tem_ple["area"].__contains__, ("埼玉", "千葉", "茨城", "栃木", "群馬", "東京"))):
-                basyo = random.choice(
-                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "埼玉", "埼玉", "埼玉", "茨城", "栃木", "群馬", "千葉", "千葉"])
-            elif any(map(tem_ple["area"].__contains__, ("青森", "岩手", "宮城", "福島", "秋田", "山形"))):
-                basyo = random.choice(
-                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "宮城", "宮城", "宮城", "青森", "岩手", "福島", "秋田", "山形"])
-            elif any(map(tem_ple["area"].__contains__, ("大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"))):
-                basyo = random.choice(
-                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"])
+            # myadd = driver.find_element(By.XPATH,
+            #                             "/html/body/article/div[1]/span[2]").text
+            # if any(map(tem_ple["area"].__contains__, ("名古屋", "愛知", "岐阜", "三重", "長野", "静岡"))):
+            #     basyo = random.choice(
+            #         [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "愛知", "愛知", "愛知", "愛知", "長野", "三重", "岐阜", "静岡"])
+            # elif any(map(tem_ple["area"].__contains__, ("埼玉", "千葉", "茨城", "栃木", "群馬", "東京"))):
+            #     basyo = random.choice(
+            #         [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "埼玉", "埼玉", "埼玉", "茨城", "栃木", "群馬", "千葉", "千葉"])
+            # elif any(map(tem_ple["area"].__contains__, ("青森", "岩手", "宮城", "福島", "秋田", "山形"))):
+            #     basyo = random.choice(
+            #         [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "宮城", "宮城", "宮城", "青森", "岩手", "福島", "秋田", "山形"])
+            # elif any(map(tem_ple["area"].__contains__, ("大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"))):
+            #     basyo = random.choice(
+            #         [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"])
 
-            else:
-                basyo = tem_ple["area"]
+            # else:
+            #     basyo = tem_ple["area"]
             junl = random.choice(list(junlSet))
             tokois = self.toko(driver, basyo, junl)
             if not tokois:
@@ -1374,22 +1375,7 @@ class Ikkr:
             time.sleep(2)
             wait.until(EC.visibility_of_element_located(
                 (By.XPATH, "/html/body/article/div[1]/span[2]")))
-            myadd = tem_ple["area"]
-            if any(map(tem_ple["area"].__contains__, ("名古屋", "愛知", "岐阜", "三重", "長野", "静岡", "愛知県", "岐阜県", "三重県", "長野県", "静岡県"))):
-                basyo = random.choice(
-                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "愛知", "愛知", "愛知", "愛知", "長野", "三重", "岐阜",
-                     "静岡"])
-            elif any(map(tem_ple["area"].__contains__, ("神奈川", "埼玉", "千葉", "茨城", "栃木", "群馬", "東京", "埼玉県", "千葉県", "茨城県", "栃木県", "群馬県", "東京都", "神奈川県"))):
-                basyo = random.choice(
-                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "神奈川", "神奈川", "埼玉", "埼玉", "埼玉", "茨城", "栃木", "群馬", "千葉",
-                     "千葉"])
-
-            elif any(map(tem_ple["area"].__contains__, ("青森", "岩手", "宮城", "福島", "秋田", "山形"))):
-                basyo = random.choice(
-                    [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "宮城", "宮城", "宮城", "青森", "岩手", "福島", "秋田",
-                     "山形"])
-            else:
-                basyo = tem_ple["area"]
+            basyo = tem_ple["area"].strip()
             bnm = int(self.basyo_change(basyo)) - 1
             elem = "/html/body/article/div[2]/div[{0}]/a".format(bnm)
             exe_click(driver, "xpath", elem)
@@ -1413,26 +1399,28 @@ class Ikkr:
         wait = WebDriverWait(driver, 15)
         lg.debug(tem_ple["cnm"])
         random.seed()
-        myadd = tem_ple["area"]
-        if any(map(tem_ple["area"].__contains__, ("名古屋", "愛知", "岐阜", "三重", "長野", "静岡", "愛知県", "岐阜県", "三重県", "長野県", "静岡県"))):
-            basyo = random.choice(
-                [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "愛知", "愛知", "愛知", "愛知", "長野", "三重", "岐阜",
-                 "静岡"])
-        elif any(map(tem_ple["area"].__contains__, ("神奈川", "埼玉", "千葉", "茨城", "栃木", "群馬", "東京", "埼玉県", "千葉県", "茨城県", "栃木県", "群馬県", "東京都", "神奈川県"))):
-            basyo = random.choice(
-                [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "神奈川", "神奈川", "埼玉", "埼玉", "埼玉", "茨城", "栃木", "群馬", "千葉",
-                 "千葉"])
+        area_list = self.get_area_list()
+        basyo = random.choice(area_list)
+        # myadd = tem_ple["area"]
+        # if any(map(tem_ple["area"].__contains__, ("名古屋", "愛知", "岐阜", "三重", "長野", "静岡", "愛知県", "岐阜県", "三重県", "長野県", "静岡県"))):
+        #     basyo = random.choice(
+        #         [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "愛知", "愛知", "愛知", "愛知", "長野", "三重", "岐阜",
+        #          "静岡"])
+        # elif any(map(tem_ple["area"].__contains__, ("神奈川", "埼玉", "千葉", "茨城", "栃木", "群馬", "東京", "埼玉県", "千葉県", "茨城県", "栃木県", "群馬県", "東京都", "神奈川県"))):
+        #     basyo = random.choice(
+        #         [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "神奈川", "神奈川", "埼玉", "埼玉", "埼玉", "茨城", "栃木", "群馬", "千葉",
+        #          "千葉"])
 
-        elif any(map(tem_ple["area"].__contains__, ("青森", "岩手", "宮城", "福島", "秋田", "山形"))):
-            basyo = random.choice(
-                [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "宮城", "宮城", "宮城", "青森", "岩手", "福島", "秋田",
-                 "山形"])
-        elif any(map(tem_ple["area"].__contains__, ("大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"))):
-            basyo = random.choice(
-                [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"])
+        # elif any(map(tem_ple["area"].__contains__, ("青森", "岩手", "宮城", "福島", "秋田", "山形"))):
+        #     basyo = random.choice(
+        #         [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "宮城", "宮城", "宮城", "青森", "岩手", "福島", "秋田",
+        #          "山形"])
+        # elif any(map(tem_ple["area"].__contains__, ("大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"))):
+        #     basyo = random.choice(
+        #         [myadd, myadd, myadd, myadd, myadd, myadd, myadd, myadd, "大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"])
 
-        else:
-            basyo = tem_ple["area"]
+        # else:
+        #     basyo = tem_ple["area"]
 
         try:
             #プロフ検索で探す相手の場所を設定
@@ -1499,19 +1487,21 @@ class Ikkr:
         wait = WebDriverWait(driver, 15)
         lg.debug(tem_ple["cnm"])
         random.seed()
-        myadd = tem_ple["area"]
-        if any(map(tem_ple["area"].__contains__, ("名古屋", "愛知", "岐阜", "三重", "長野", "静岡", "愛知県", "岐阜県", "三重県", "長野県", "静岡県"))):
-            area_list = ['愛知', '静岡', '岐阜', '三重', '長野']
-        elif any(map(tem_ple["area"].__contains__, ("神奈川", "埼玉", "千葉", "茨城", "栃木", "群馬", "東京", "埼玉県", "千葉県", "茨城県", "栃木県", "群馬県", "東京都", "神奈川県"))):
-            area_list = ['神奈川', '埼玉', '千葉', '三重', '東京', '群馬', '茨城', '栃木']
+        area_list = self.get_area_list()
+        basyo = random.choice(area_list)
+        # myadd = tem_ple["area"]
+        # if any(map(tem_ple["area"].__contains__, ("名古屋", "愛知", "岐阜", "三重", "長野", "静岡", "愛知県", "岐阜県", "三重県", "長野県", "静岡県"))):
+        #     area_list = ['愛知', '静岡', '岐阜', '三重', '長野']
+        # elif any(map(tem_ple["area"].__contains__, ("神奈川", "埼玉", "千葉", "茨城", "栃木", "群馬", "東京", "埼玉県", "千葉県", "茨城県", "栃木県", "群馬県", "東京都", "神奈川県"))):
+        #     area_list = ['神奈川', '埼玉', '千葉', '三重', '東京', '群馬', '茨城', '栃木']
 
-        elif any(map(tem_ple["area"].__contains__, ("青森", "岩手", "宮城", "福島", "秋田", "山形"))):
-            area_list = ['青森', '岩手', '宮城', '福島', '秋田', '山形']
-        elif any(map(tem_ple["area"].__contains__, ("大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"))):
-            area_list = ['大阪', '滋賀', '京都', '兵庫', '奈良', '和歌山']
+        # elif any(map(tem_ple["area"].__contains__, ("青森", "岩手", "宮城", "福島", "秋田", "山形"))):
+        #     area_list = ['青森', '岩手', '宮城', '福島', '秋田', '山形']
+        # elif any(map(tem_ple["area"].__contains__, ("大阪府", "滋賀県", "京都府", "兵庫県", "奈良県", "和歌山県"))):
+        #     area_list = ['大阪', '滋賀', '京都', '兵庫', '奈良', '和歌山']
 
-        else:
-            area_list = [myadd]
+        # else:
+        #     area_list = [myadd]
         try:
             #プロフ検索で探す相手の場所を設定
             driver.get("https://sp.194964.com/profile/profilesearch/show_profile_search.html")
@@ -1537,7 +1527,7 @@ class Ikkr:
                 exe_click(driver, "id", "city_button")
                 time.sleep(2)
 
-            #愛知、静岡、岐阜、三重、長野を追加
+            #area_listの地域全部追加
             for basyo in area_list:
                 city_btn = driver.find_elements(By.ID, "city_button")
                 if len(city_btn) != 0:

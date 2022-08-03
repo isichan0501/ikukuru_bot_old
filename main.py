@@ -211,7 +211,7 @@ if __name__ == "__main__":
     for loop_num, n in enumerate(ik_index):
         #テンプレ取得
         tem_ple = df.iloc[n,:]
-        if tem_ple['cnm'] != 'mika':
+        if len(sys.argv) == 2 and tem_ple['cnm'] != sys.argv[1]:
             continue
         
         is_main = super_main(tem_ple, main_loop=1)
