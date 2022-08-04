@@ -701,7 +701,8 @@ class Ikkr:
                 return True
             
             #1ページに10通メッセージがあるのでunread_messege_count÷10(切り上げ)
-            page_number = -(-unread_messege_count // 10)
+            # page_number = -(-unread_messege_count // 10)
+            page_number = (unread_messege_count // 10)
             #. +余分に何ページか移動するため.
             #移動ページできるページ数とelemの数が一致する
             elem = driver.find_elements(By.XPATH, "/html/body/article//li[@class=\"listPaginator2 button\"]/a")

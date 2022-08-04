@@ -1,7 +1,7 @@
 mkdir images
 mkdir secrets
 mkdir logs
-toucu .env
+touch .env
 
 #undetected_chromedriverのフォーク版
 pip install -U git+https://github.com/sebdelsol/undetected-chromedriver.git
