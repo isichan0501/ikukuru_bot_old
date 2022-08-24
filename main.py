@@ -190,15 +190,15 @@ def super_main(tem_ple, main_loop=3):
                 mail_try(ik, driver)
 
 
-            if (loop_num % 2) == 0:
-                #pure or adultを引数に
-                ik.retoko(driver, pure_adlut="pure")
-            else:
-                ik.retoko(driver, pure_adlut="adult")
+            # if (loop_num % 2) == 0:
+            #     #pure or adultを引数に
+            #     ik.retoko(driver, pure_adlut="pure")
+            # else:
+            #     ik.retoko(driver, pure_adlut="adult")
 
             if not is_toko:
                 
-                ik.toko_check(driver)    
+                is_toko = ik.toko_check(driver)    
 
 
 
